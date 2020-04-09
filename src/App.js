@@ -24,8 +24,9 @@ export default function App() {
   return (
     <Container>
       <ButtonGroup>
-        <button onClick={save_as_svg}>SAVE</button>
-        <button onClick={removeLastGroup}>REMOVE LAST ONE</button>
+        <button onClick={save_as_svg}>SAVE SVG</button>
+        <button onClick={copy_svg}>COPY SVG</button>
+        <button onClick={removeLastGroup}>REMOVE LAST</button>
       </ButtonGroup>
       <SVG
         id="svg"
@@ -118,6 +119,11 @@ const save_as_svg = () => {
   saveAs(blob, "triangles.svg");
 };
 
+const copy_svg = () => {
+  var full_svg = get_svg_text();
+  copyToClipboard(full_svg);
+};
+
 const get_svg_text = () => {
   var svg_data = document.getElementById("svg")
     ? document.getElementById("svg").outerHTML
@@ -127,4 +133,25 @@ const get_svg_text = () => {
   `);
 
   return svg_data;
+};
+
+const copyToClipboard = (str) => {
+  const el = document.createElement("textarea"); // Create a <textarea> element
+  el.value = str; // Set its value to the string that you want copied
+  el.setAttribute("readonly", ""); // Make it readonly to be tamper-proof
+  el.style.position = "absolute";
+  el.style.left = "-9999px"; // Move outside the screen to make it invisible
+  document.body.appendChild(el); // Append the <textarea> element to the HTML document
+  const selected =
+    document.getSelection().rangeCount > 0 // Check if there is any content selected previously
+      ? document.getSelection().getRangeAt(0) // Store selection if found
+      : false; // Mark as false to know no selection existed before
+  el.select(); // Select the <textarea> content
+  document.execCommand("copy"); // Copy - only works as a result of a user action (e.g. click events)
+  document.body.removeChild(el); // Remove the <textarea> element
+  if (selected) {
+    // If a selection existed before copying
+    document.getSelection().removeAllRanges(); // Unselect everything on the HTML document
+    document.getSelection().addRange(selected); // Restore the original selection
+  }
 };
