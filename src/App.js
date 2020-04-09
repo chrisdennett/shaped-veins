@@ -3,6 +3,8 @@ import { saveAs } from "file-saver";
 import styled from "styled-components";
 
 export default function App() {
+  const [width, setWidth] = useState(1920);
+  const [height, setHeight] = useState(1080);
   const [currNodes, setCurrNodes] = useState([]);
   const [groups, setGroups] = useState([]);
 
@@ -21,18 +23,52 @@ export default function App() {
     setGroups((prevGroups) => prevGroups.slice(0, prevGroups.length - 1));
   };
 
+  const creatingGroup = currNodes.length > 0;
+
   return (
     <Container>
-      <ButtonGroup>
-        <button onClick={save_as_svg}>SAVE SVG</button>
-        <button onClick={copy_svg}>COPY SVG</button>
-        <button onClick={removeLastGroup}>REMOVE LAST</button>
-      </ButtonGroup>
+      {!creatingGroup && (
+        <Controls>
+          <button onClick={save_as_svg}>SAVE SVG</button>
+          <button onClick={copy_svg}>COPY SVG</button>
+          <button onClick={removeLastGroup}>REMOVE LAST</button>
+          <label>
+            width:
+            <input
+              onChange={(e) => setWidth(e.target.value)}
+              maxLength="4"
+              size="4"
+              type="number"
+              value={width}
+            />
+          </label>
+          <label>
+            height:
+            <input
+              onChange={(e) => setHeight(e.target.value)}
+              maxLength="4"
+              size="4"
+              type="number"
+              value={height}
+            />
+          </label>
+        </Controls>
+      )}
       <SVG
+        width={width > 0 ? width : 1}
+        height={height > 0 ? height : 1}
         id="svg"
         xmlns="http://www.w3.org/2000/svg"
         onClick={(e) => addNode(e.clientX, e.clientY)}
       >
+        <rect
+          x={0}
+          y={0}
+          width={width}
+          height={height}
+          stroke={"none"}
+          fill={"black"}
+        />
         <g>
           {currNodes.map((node, index) => (
             <circle
@@ -82,7 +118,7 @@ const Triangles = ({ nodes, uid }) => {
   ));
 };
 
-const ButtonGroup = styled.div`
+const Controls = styled.div`
   position: absolute;
   button {
     margin-right: 10px;
@@ -90,20 +126,24 @@ const ButtonGroup = styled.div`
     background: yellow;
     font-weight: bold;
   }
+  label {
+    color: white;
+  }
+  input {
+    width: 60px;
+    margin-right: 10px;
+  }
 `;
 
 const Container = styled.div`
   width: 100%;
   height: 100vh;
-  border: red;
-  background: red;
+  background: white;
   overflow: hidden;
 `;
 
 const SVG = styled.svg`
   background: black;
-  width: 100%;
-  height: 100%;
   line-height: 0;
   stroke: white;
   stroke-width: 2px;
