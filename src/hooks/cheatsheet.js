@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 
-const Cheatsheet = () => {
+const Cheatsheet = ({ onClick }) => {
   return (
-    <Holder>
+    <Holder onClick={onClick}>
       <Sheet>
         <h1>Cheatsheet</h1>
         <Shortcuts>
@@ -52,7 +52,6 @@ const Sheet = styled.div`
   min-width: 300px;
   padding: 2%;
   text-align: left;
-  font-size: 1.5rem;
 
   h1 {
     margin: 5px 0;

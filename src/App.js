@@ -46,6 +46,8 @@ export default function App() {
     setGroups((prev) => prev.slice(0, prev.length - 1));
   };
 
+  const onCheatsheetClick = () => setShowCheapsheet(false);
+
   return (
     <Container>
       {showControls && (
@@ -76,7 +78,7 @@ export default function App() {
         </Controls>
       )}
 
-      {showCheatsheet && <Cheatsheet />}
+      {showCheatsheet && <Cheatsheet onClick={onCheatsheetClick} />}
 
       <SVG
         isEditing={isEditing}
