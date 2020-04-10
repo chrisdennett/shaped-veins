@@ -1,12 +1,20 @@
 import React, { useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { saveAs } from "file-saver";
 import styled from "styled-components";
+// comps
+import { Pyramid } from "./Pyramid";
 
 export default function App() {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showControls, setShowControls] = useState(true);
   const [width, setWidth] = useState(1920);
   const [height, setHeight] = useState(1080);
   const [currNodes, setCurrNodes] = useState([]);
   const [groups, setGroups] = useState([]);
+
+  useHotkeys("h", () => setShowControls((prev) => !prev));
+  useHotkeys("a", () => setIsAnimating((prev) => !prev));
 
   const addNode = (x, y) => {
     const isPeak = currNodes.length === 0;
@@ -27,10 +35,10 @@ export default function App() {
 
   return (
     <Container>
-      {!creatingGroup && (
+      {showControls && !creatingGroup && (
         <Controls>
           <button onClick={save_as_svg}>SAVE SVG</button>
-          <button onClick={copy_svg}>COPY SVG</button>
+          {/* <button onClick={copy_svg}>COPY SVG</button> */}
           <button onClick={removeLastGroup}>REMOVE LAST</button>
           <label>
             width:
@@ -81,42 +89,19 @@ export default function App() {
           ))}
         </g>
 
-        {<TriangleGroups groups={groups} />}
+        {groups.map((group, index) => (
+          <g key={"g-" + index}>
+            <Pyramid
+              nodes={group}
+              uid={"t" + index}
+              isAnimating={isAnimating}
+            />
+          </g>
+        ))}
       </SVG>
     </Container>
   );
 }
-
-const TriangleGroups = ({ groups, inEditMode }) => {
-  return groups.map((group, index) => {
-    return (
-      <g key={"g-" + index}>
-        <Triangles nodes={group} uid={"t" + index} />
-      </g>
-    );
-  });
-};
-
-const Triangles = ({ nodes, uid }) => {
-  const peakNode = nodes.filter((node) => node.isPeak)[0];
-  const edgeNodes = nodes.filter((node) => !node.isPeak);
-  const trianglePaths = [];
-
-  const { x: x0, y: y0 } = peakNode;
-
-  for (let i = 0; i < edgeNodes.length; i++) {
-    const { x: x1, y: y1 } = edgeNodes[i];
-    const isLastNode = i === edgeNodes.length - 1;
-    const nextNode = isLastNode ? edgeNodes[0] : edgeNodes[i + 1];
-    const { x: x2, y: y2 } = nextNode;
-
-    trianglePaths.push(`M ${x0},${y0} L ${x1}, ${y1} L ${x2}, ${y2} Z`);
-  }
-
-  return trianglePaths.map((path, index) => (
-    <path key={uid + "" + index} fill={"none"} stroke={"white"} d={path} />
-  ));
-};
 
 const Controls = styled.div`
   position: absolute;
