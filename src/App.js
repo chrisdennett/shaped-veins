@@ -11,9 +11,12 @@ import Cheatsheet from "./hooks/cheatsheet";
 
 export default function App() {
   const [isAnimating, setIsAnimating] = useState(true);
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [showCheatsheet, setShowCheapsheet] = useState(true);
+  const [showCheatsheet, setShowCheapsheet] = useLocalStorage(
+    "showCheatsheet",
+    true
+  );
   const [width, setWidth] = useState(1920);
   const [height, setHeight] = useState(1080);
   const [currNodes, setCurrNodes] = useState([]);

@@ -1,43 +1,75 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { useAnimationFrame } from "./hooks/useAnimationFrame";
+import { Triangle } from "./Triangle";
 
 export const Pyramid = ({ nodes, uid, isAnimating, isEditing }) => {
-  const [hue, setHue] = React.useState(Math.round(Math.random() * 360));
+  const [hue, setHue] = useState(Math.round(Math.random() * 360));
+  const [frameDecimal, setFrameDecimal] = useState(0);
 
   const peakNode = nodes.filter((node) => node.isPeak)[0];
   const edgeNodes = nodes.filter((node) => !node.isPeak);
-
-  const trianglePaths = [];
 
   useAnimationFrame((deltaTime) => {
     // Pass on a function to the setter of the state
     // to make sure we always have the latest state
     setHue((prevHue) => (prevHue + deltaTime * 0.08) % 360);
+    setFrameDecimal((prevDec) => (prevDec >= 1 ? 0 : prevDec + 0.01));
   });
 
-  const { x: x0, y: y0 } = peakNode;
+  const triangles = [
+    <Triangle
+      key={"tri-1"}
+      index={0}
+      hue={hue}
+      frameDecimal={frameDecimal}
+      points={[peakNode, edgeNodes[0], edgeNodes[1]]}
+      isAnimating={isAnimating}
+      isEditing={isEditing}
+    />,
+    <Triangle
+      key={"tri-2"}
+      index={1}
+      hue={hue}
+      frameDecimal={frameDecimal}
+      points={[peakNode, edgeNodes[1], edgeNodes[2]]}
+      isAnimating={isAnimating}
+      isEditing={isEditing}
+    />,
+    <Triangle
+      key={"tri-3"}
+      index={2}
+      hue={hue}
+      frameDecimal={frameDecimal}
+      points={[peakNode, edgeNodes[2], edgeNodes[0]]}
+      isAnimating={isAnimating}
+      isEditing={isEditing}
+    />,
+  ];
 
-  for (let i = 0; i < edgeNodes.length; i++) {
-    const { x: x1, y: y1 } = edgeNodes[i];
-    const isLastNode = i === edgeNodes.length - 1;
-    const nextNode = isLastNode ? edgeNodes[0] : edgeNodes[i + 1];
-    const { x: x2, y: y2 } = nextNode;
+  return triangles;
 
-    trianglePaths.push(`M ${x0},${y0} L ${x1}, ${y1} L ${x2}, ${y2} Z`);
-  }
+  //   return trianglePaths.map((path, index) => (
+  //     <g key={uid + "-" + index}>
+  //       <line
+  //         x1={lineX1}
+  //         y1={lineY1}
+  //         x2={lineX2}
+  //         y2={lineY2}
+  //         stroke={"white"}
+  //         strokeWidth={5}
+  //       />
 
-  return trianglePaths.map((path, index) => (
-    <path
-      key={uid + "" + index}
-      fill={
-        isAnimating
-          ? `hsl(${hue}, ${100 - index * 20}%, ${12 + 20 * index}%)`
-          : "none"
-      }
-      stroke={isAnimating && !isEditing ? "black" : "white"}
-      strokeWidth={4}
-      d={path}
-    />
-  ));
+  //       <path
+  //         fill={
+  //           isAnimating
+  //             ? `hsl(${hue}, ${100 - index * 20}%, ${12 + 20 * index}%)`
+  //             : "none"
+  //         }
+  //         stroke={isAnimating && !isEditing ? "black" : "white"}
+  //         strokeWidth={4}
+  //         d={path}
+  //       />
+  //     </g>
+  //   ));
 };
