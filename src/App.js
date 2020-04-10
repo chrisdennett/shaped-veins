@@ -18,8 +18,11 @@ export default function App() {
   useHotkeys("h", () => setShowControls((prev) => !prev));
   useHotkeys("a", () => setIsAnimating((prev) => !prev));
   useHotkeys("e", () => setIsEditing((prev) => !prev));
+  useHotkeys("z", () => removeLastNode());
+  useHotkeys("x", () => removeLastGroup());
 
   const addNode = (x, y) => {
+    if (!isEditing) return;
     const isPeak = currNodes.length === 0;
     const node = { x, y, isPeak };
     if (currNodes.length === 3) {
@@ -28,6 +31,10 @@ export default function App() {
     } else {
       setCurrNodes((prevArr) => [...prevArr, node]);
     }
+  };
+
+  const removeLastNode = () => {
+    setCurrNodes((prev) => prev.slice(0, prev.length - 1));
   };
 
   const removeLastGroup = () => {
@@ -64,6 +71,7 @@ export default function App() {
         </Controls>
       )}
       <SVG
+        isEditing={isEditing}
         width={width > 0 ? width : 1}
         height={height > 0 ? height : 1}
         id="svg"
@@ -78,6 +86,18 @@ export default function App() {
           stroke={"none"}
           fill={"black"}
         />
+
+        {groups.map((group, index) => (
+          <g key={"g-" + index}>
+            <Pyramid
+              nodes={group}
+              uid={"t" + index}
+              isEditing={isEditing}
+              isAnimating={isAnimating}
+            />
+          </g>
+        ))}
+
         <g>
           {currNodes.map((node, index) => (
             <circle
@@ -90,16 +110,6 @@ export default function App() {
             />
           ))}
         </g>
-
-        {groups.map((group, index) => (
-          <g key={"g-" + index}>
-            <Pyramid
-              nodes={group}
-              uid={"t" + index}
-              isAnimating={isAnimating}
-            />
-          </g>
-        ))}
 
         {isEditing && <EditCrossHairs width={width} height={height} />}
       </SVG>
@@ -139,7 +149,7 @@ const SVG = styled.svg`
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
-  cursor: crosshair;
+  cursor: ${(props) => (props.isEditing ? "crosshair" : "inherit")};
 `;
 
 // helpers

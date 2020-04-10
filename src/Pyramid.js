@@ -2,7 +2,7 @@ import React from "react";
 
 import { useAnimationFrame } from "./hooks/useAnimationFrame";
 
-export const Pyramid = ({ nodes, uid, isAnimating }) => {
+export const Pyramid = ({ nodes, uid, isAnimating, isEditing }) => {
   const [hue, setHue] = React.useState(Math.round(Math.random() * 360));
 
   const peakNode = nodes.filter((node) => node.isPeak)[0];
@@ -30,8 +30,12 @@ export const Pyramid = ({ nodes, uid, isAnimating }) => {
   return trianglePaths.map((path, index) => (
     <path
       key={uid + "" + index}
-      fill={isAnimating ? `hsl(${hue}, 100%, ${40 + index * 13}%)` : "none"}
-      stroke={isAnimating ? "black" : "white"}
+      fill={
+        isAnimating
+          ? `hsl(${hue}, ${100 - index * 20}%, ${12 + 20 * index}%)`
+          : "none"
+      }
+      stroke={isAnimating && !isEditing ? "black" : "white"}
       strokeWidth={4}
       d={path}
     />
