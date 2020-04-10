@@ -1,55 +1,56 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 export const Triangle = ({
   points,
   index,
   hue,
-  frameDecimal,
   isAnimating,
+  isAnimating2,
   isEditing,
 }) => {
   const peakNode = points[0];
 
-  const lineStart = {
-    x1: points[1].x,
-    y1: points[1].y,
-    x2: points[2].x,
-    y2: points[2].y,
-    tartX: peakNode.x,
-    tartY: peakNode.y,
-  };
-
-  const incX1 = peakNode.x - lineStart.x1;
-  const incX2 = peakNode.x - lineStart.x2;
-  const incY1 = peakNode.y - lineStart.y1;
-  const incY2 = peakNode.y - lineStart.y2;
-
-  const lineX1 = lineStart.x1 + frameDecimal * incX1;
-  const lineX2 = lineStart.x2 + frameDecimal * incX2;
-  const lineY1 = lineStart.y1 + frameDecimal * incY1;
-  const lineY2 = lineStart.y2 + frameDecimal * incY2;
-
   return (
     <g>
-      <path
-        fill={
-          isAnimating
-            ? `hsl(${hue}, ${100 - index * 20}%, ${12 + 20 * index}%)`
-            : "none"
-        }
-        stroke={isAnimating && !isEditing ? "black" : "white"}
+      <motion.path
+        stroke={isAnimating && !isEditing ? "white" : "white"}
         strokeWidth={4}
         d={`M ${points[0].x},${points[0].y} L ${points[1].x},${points[1].y} L ${points[2].x},${points[2].y} Z`}
+        animate={{
+          pathLength: 1,
+          pathOffset: 0,
+          fill: `hsl(${hue}, ${100 - index * 20}%, ${12 + 20 * index}%)`,
+          transition: { duration: 3, flip: Infinity },
+        }}
+        initial={{
+          pathLength: 0,
+          pathOffset: 1,
+          fill: `hsl(${hue + 360}, ${100 - index * 20}%, ${12 + 20 * index}%)`,
+          transition: { duration: 3, flip: Infinity },
+        }}
       />
 
-      <line
-        x1={lineX1}
-        y1={lineY1}
-        x2={lineX2}
-        y2={lineY2}
-        stroke={"white"}
-        strokeWidth={5}
-      />
+      {isAnimating2 && (
+        <motion.line
+          initial={{
+            x1: peakNode.x,
+            x2: peakNode.x,
+            y1: peakNode.y,
+            y2: peakNode.y,
+            transition: { duration: 3, flip: Infinity },
+          }}
+          animate={{
+            x1: points[1].x,
+            y1: points[1].y,
+            x2: points[2].x,
+            y2: points[2].y,
+            transition: { duration: 3, flip: Infinity },
+          }}
+          stroke={"white"}
+          strokeWidth={5}
+        />
+      )}
     </g>
   );
 };
