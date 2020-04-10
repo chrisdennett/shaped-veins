@@ -11,7 +11,7 @@ import Cheatsheet from "./hooks/cheatsheet";
 
 export default function App() {
   const [isAnimating, setIsAnimating] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [showControls, setShowControls] = useState(true);
   const [showCheatsheet, setShowCheapsheet] = useState(true);
   const [width, setWidth] = useState(1920);
@@ -25,6 +25,7 @@ export default function App() {
   useHotkeys("e", () => setIsEditing((prev) => !prev));
   useHotkeys("z", () => removeLastNode());
   useHotkeys("x", () => removeLastGroup());
+  useHotkeys("s", () => save_as_svg());
 
   const addNode = (x, y) => {
     if (!isEditing) return;
@@ -47,14 +48,19 @@ export default function App() {
   };
 
   const onCheatsheetClick = () => setShowCheapsheet(false);
+  const onShowCheatSheet = () => setShowCheapsheet(true);
+  const toggleEditing = () => setIsEditing((prev) => !prev);
 
   return (
     <Container>
       {showControls && (
         <Controls>
-          <button onClick={save_as_svg}>SAVE SVG</button>
+          <button onClick={save_as_svg}>Save SVG - s</button>
           {/* <button onClick={copy_svg}>COPY SVG</button> */}
-          <button onClick={removeLastGroup}>REMOVE LAST</button>
+          <button onClick={removeLastGroup}>Delete Last Pyramid - x</button>
+          <button onClick={removeLastNode}>Undo Last Point - z</button>
+          <button onClick={onShowCheatSheet}>Cheatsheet - c</button>
+          <button onClick={toggleEditing}>Toggle Editing - e</button>
           <label>
             width:
             <input
