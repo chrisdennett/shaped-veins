@@ -1,20 +1,25 @@
 import React, { useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+// import { useHotkeys } from "react-hotkeys-hook";
+import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { saveAs } from "file-saver";
 import styled from "styled-components";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 // comps
 import { Pyramid } from "./Pyramid";
 import { EditCrossHairs } from "./EditCrosshairs";
+import Cheatsheet from "./hooks/cheatsheet";
 
 export default function App() {
   const [isAnimating, setIsAnimating] = useState(true);
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [showCheatsheet, setShowCheapsheet] = useState(true);
   const [width, setWidth] = useState(1920);
   const [height, setHeight] = useState(1080);
   const [currNodes, setCurrNodes] = useState([]);
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useLocalStorage("groups", []);
 
+  useHotkeys("c", () => setShowCheapsheet((prev) => !prev));
   useHotkeys("h", () => setShowControls((prev) => !prev));
   useHotkeys("a", () => setIsAnimating((prev) => !prev));
   useHotkeys("e", () => setIsEditing((prev) => !prev));
@@ -38,7 +43,7 @@ export default function App() {
   };
 
   const removeLastGroup = () => {
-    setGroups((prevGroups) => prevGroups.slice(0, prevGroups.length - 1));
+    setGroups((prev) => prev.slice(0, prev.length - 1));
   };
 
   return (
@@ -70,6 +75,9 @@ export default function App() {
           </label>
         </Controls>
       )}
+
+      {showCheatsheet && <Cheatsheet />}
+
       <SVG
         isEditing={isEditing}
         width={width > 0 ? width : 1}
