@@ -13,7 +13,7 @@ export const Pyramid = ({ nodes, uid, isAnimating }) => {
   useAnimationFrame((deltaTime) => {
     // Pass on a function to the setter of the state
     // to make sure we always have the latest state
-    setHue((prevHue) => (prevHue + deltaTime * 0.01) % 360);
+    setHue((prevHue) => (prevHue + deltaTime * 0.08) % 360);
   });
 
   const { x: x0, y: y0 } = peakNode;
@@ -30,7 +30,7 @@ export const Pyramid = ({ nodes, uid, isAnimating }) => {
   return trianglePaths.map((path, index) => (
     <path
       key={uid + "" + index}
-      fill={isAnimating ? `hsl(${hue}, 100%, ${index * 15 + 50}%)` : "none"}
+      fill={isAnimating ? `hsl(${hue}, 100%, ${40 + index * 13}%)` : "none"}
       stroke={isAnimating ? "black" : "white"}
       strokeWidth={4}
       d={path}

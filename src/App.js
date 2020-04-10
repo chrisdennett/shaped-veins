@@ -4,9 +4,11 @@ import { saveAs } from "file-saver";
 import styled from "styled-components";
 // comps
 import { Pyramid } from "./Pyramid";
+import { EditCrossHairs } from "./EditCrosshairs";
 
 export default function App() {
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(true);
+  const [isEditing, setIsEditing] = useState(true);
   const [showControls, setShowControls] = useState(true);
   const [width, setWidth] = useState(1920);
   const [height, setHeight] = useState(1080);
@@ -15,6 +17,7 @@ export default function App() {
 
   useHotkeys("h", () => setShowControls((prev) => !prev));
   useHotkeys("a", () => setIsAnimating((prev) => !prev));
+  useHotkeys("e", () => setIsEditing((prev) => !prev));
 
   const addNode = (x, y) => {
     const isPeak = currNodes.length === 0;
@@ -31,11 +34,9 @@ export default function App() {
     setGroups((prevGroups) => prevGroups.slice(0, prevGroups.length - 1));
   };
 
-  const creatingGroup = currNodes.length > 0;
-
   return (
     <Container>
-      {showControls && !creatingGroup && (
+      {showControls && (
         <Controls>
           <button onClick={save_as_svg}>SAVE SVG</button>
           {/* <button onClick={copy_svg}>COPY SVG</button> */}
@@ -84,7 +85,8 @@ export default function App() {
               stroke={node.isPeak ? "red" : "yellow"}
               cx={node.x}
               cy={node.y}
-              r={3}
+              fill={node.isPeak ? "red" : "yellow"}
+              r={6}
             />
           ))}
         </g>
@@ -98,6 +100,8 @@ export default function App() {
             />
           </g>
         ))}
+
+        {isEditing && <EditCrossHairs width={width} height={height} />}
       </SVG>
     </Container>
   );
@@ -135,6 +139,7 @@ const SVG = styled.svg`
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
+  cursor: crosshair;
 `;
 
 // helpers
