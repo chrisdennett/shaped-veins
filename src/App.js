@@ -40,6 +40,7 @@ export default function App() {
   const controlsProps = {
     removeLastNode,
     removeLastGroup,
+    isEditing,
     toggleEditing,
     setWidth,
     setHeight,
@@ -47,6 +48,7 @@ export default function App() {
     height,
     setAnimationIndex,
     animationIndex,
+    save_as_svg,
   };
 
   return (
