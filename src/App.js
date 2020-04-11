@@ -1,36 +1,19 @@
 import React, { useState } from "react";
-// import { useHotkeys } from "react-hotkeys-hook";
-import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { saveAs } from "file-saver";
 import styled from "styled-components";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 // comps
 import { Pyramid } from "./Pyramid";
 import { EditCrossHairs } from "./EditCrosshairs";
-import Cheatsheet from "./hooks/cheatsheet";
+import { Controls } from "./controls/Controls";
 
 export default function App() {
-  const [isAnimating, setIsAnimating] = useState(true);
-  const [isAnimating2, setIsAnimating2] = useState(false);
+  const [animationIndex, setAnimationIndex] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [showCheatsheet, setShowCheapsheet] = useLocalStorage(
-    "showCheatsheet",
-    true
-  );
-  const [width, setWidth] = useState(1920);
-  const [height, setHeight] = useState(1080);
+  const [width, setWidth] = useLocalStorage("width", 1920);
+  const [height, setHeight] = useLocalStorage("height", 1080);
   const [currNodes, setCurrNodes] = useState([]);
   const [groups, setGroups] = useLocalStorage("groups", []);
-
-  useHotkeys("c", () => setShowCheapsheet((prev) => !prev));
-  useHotkeys("h", () => setShowControls((prev) => !prev));
-  useHotkeys("a", () => setIsAnimating((prev) => !prev));
-  useHotkeys("2", () => setIsAnimating2((prev) => !prev));
-  useHotkeys("e", () => setIsEditing((prev) => !prev));
-  useHotkeys("z", () => removeLastNode());
-  useHotkeys("x", () => removeLastGroup());
-  useHotkeys("s", () => save_as_svg());
 
   const addNode = (x, y) => {
     if (!isEditing) return;
@@ -52,44 +35,23 @@ export default function App() {
     setGroups((prev) => prev.slice(0, prev.length - 1));
   };
 
-  const onCheatsheetClick = () => setShowCheapsheet(false);
-  const onShowCheatSheet = () => setShowCheapsheet(true);
   const toggleEditing = () => setIsEditing((prev) => !prev);
+
+  const controlsProps = {
+    removeLastNode,
+    removeLastGroup,
+    toggleEditing,
+    setWidth,
+    setHeight,
+    width,
+    height,
+    setAnimationIndex,
+    animationIndex,
+  };
 
   return (
     <Container>
-      {showControls && (
-        <Controls>
-          <button onClick={save_as_svg}>Save SVG - s</button>
-          {/* <button onClick={copy_svg}>COPY SVG</button> */}
-          <button onClick={removeLastGroup}>Delete Last Pyramid - x</button>
-          <button onClick={removeLastNode}>Undo Last Point - z</button>
-          <button onClick={onShowCheatSheet}>Cheatsheet - c</button>
-          <button onClick={toggleEditing}>Toggle Editing - e</button>
-          <label>
-            width:
-            <input
-              onChange={(e) => setWidth(e.target.value)}
-              maxLength="4"
-              size="4"
-              type="number"
-              value={width}
-            />
-          </label>
-          <label>
-            height:
-            <input
-              onChange={(e) => setHeight(e.target.value)}
-              maxLength="4"
-              size="4"
-              type="number"
-              value={height}
-            />
-          </label>
-        </Controls>
-      )}
-
-      {showCheatsheet && <Cheatsheet onClick={onCheatsheetClick} />}
+      <Controls {...controlsProps} />
 
       <SVG
         isEditing={isEditing}
@@ -114,8 +76,9 @@ export default function App() {
               nodes={group}
               uid={"t" + index}
               isEditing={isEditing}
-              isAnimating={isAnimating}
-              isAnimating2={isAnimating2}
+              animationIndex={animationIndex}
+              isAnimating={true}
+              isAnimating2={true}
             />
           </g>
         ))}
@@ -138,23 +101,6 @@ export default function App() {
     </Container>
   );
 }
-
-const Controls = styled.div`
-  position: absolute;
-  button {
-    margin-right: 10px;
-    border: none;
-    background: yellow;
-    font-weight: bold;
-  }
-  label {
-    color: white;
-  }
-  input {
-    width: 60px;
-    margin-right: 10px;
-  }
-`;
 
 const Container = styled.div`
   width: 100%;

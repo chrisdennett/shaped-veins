@@ -1,11 +1,18 @@
 import React from "react";
 import styled from "styled-components";
 
-const Cheatsheet = ({ onClick }) => {
+export const Info = ({ onClick }) => {
   return (
     <Holder onClick={onClick}>
       <Sheet>
-        <h1>Cheatsheet</h1>
+        <h1>Info</h1>
+        <a
+          href={"https://artfly.io/projector-shape-mapping-thing/"}
+          target={"_blank"}
+          rel="noreferrer"
+        >
+          Info
+        </a>
         <Shortcuts>
           <div>
             <span>"c"</span>: toggle this Cheatsheet
@@ -31,9 +38,8 @@ const Cheatsheet = ({ onClick }) => {
   );
 };
 
-export default Cheatsheet;
-
 const Holder = styled.div`
+  z-index: 2;
   position: fixed;
   top: 0;
   bottom: 0;
