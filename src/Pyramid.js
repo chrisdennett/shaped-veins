@@ -2,7 +2,12 @@ import React, { useState } from "react";
 
 import { Triangle } from "./Triangle";
 
-export const Pyramid = ({ nodes, isEditing, animationIndex }) => {
+export const Pyramid = ({
+  nodes,
+  isEditing,
+  animationIndex,
+  setAnimationIndex,
+}) => {
   const [hue] = useState(Math.round(Math.random() * 360));
 
   const peakNode = nodes.filter((node) => node.isPeak)[0];
@@ -15,6 +20,7 @@ export const Pyramid = ({ nodes, isEditing, animationIndex }) => {
       hue={hue}
       points={[peakNode, edgeNodes[0], edgeNodes[1]]}
       animationIndex={animationIndex}
+      setAnimationIndex={setAnimationIndex}
       isEditing={isEditing}
     />,
     <Triangle
@@ -23,6 +29,7 @@ export const Pyramid = ({ nodes, isEditing, animationIndex }) => {
       hue={hue}
       points={[peakNode, edgeNodes[1], edgeNodes[2]]}
       animationIndex={animationIndex}
+      setAnimationIndex={setAnimationIndex}
       isEditing={isEditing}
     />,
     <Triangle
@@ -31,6 +38,7 @@ export const Pyramid = ({ nodes, isEditing, animationIndex }) => {
       hue={hue}
       points={[peakNode, edgeNodes[2], edgeNodes[0]]}
       animationIndex={animationIndex}
+      setAnimationIndex={setAnimationIndex}
       isEditing={isEditing}
     />,
   ];
