@@ -24,13 +24,14 @@ export const Controls = ({
   setAnimationIndex,
   animationIndex,
 }) => {
-  const [doAnimate, setDoAnimate] = useState(true);
+  const [showControls, setShowControls] = useState(true);
   const [showInfo, setShowInfo] = useLocalStorage("showInfo", true);
 
   useHotkeys("i", () => setShowInfo((prev) => !prev));
   useHotkeys("h", () => setShowControls((prev) => !prev));
   useHotkeys("1", () => setAnimationIndex(1));
   useHotkeys("2", () => setAnimationIndex(1));
+  useHotkeys("3", () => setAnimationIndex(1));
   useHotkeys("p", () => setIsEditing((prev) => !prev));
   useHotkeys("z", () => removeLastNode());
   useHotkeys("x", () => removeLastGroup());
@@ -38,74 +39,88 @@ export const Controls = ({
 
   const onShowCheatSheet = () => setShowInfo(true);
   const onInfoClick = () => setShowInfo(false);
-  const setShowControls = () => console.log("toggle controls");
   const setIsEditing = () => console.log("toggle Editing");
 
   const onAnimChange = (e) => {
     setAnimationIndex(parseInt(e.target.value));
   };
 
-  const onDoAnimateChange = (e) => {
-    const isChecked = e.target.checked;
-    if (isChecked) {
-    }
-
-    setDoAnimate(isChecked);
-  };
-
   return (
     <>
       {showInfo && <Info onClick={onInfoClick} />}
       <ControlsStyle>
-        <button onClick={onShowCheatSheet}>Info 'i'</button>
-        <label>
-          width:
-          <input
-            onChange={(e) => setWidth(e.target.value)}
-            maxLength="4"
-            size="4"
-            type="number"
-            value={width}
-          />
-        </label>
-        <label>
-          height:
-          <input
-            onChange={(e) => setHeight(e.target.value)}
-            maxLength="4"
-            size="4"
-            type="number"
-            value={height}
-          />
-        </label>
-        <button onClick={toggleEditing}>Add Pyramid 'p'</button>
-        <button onClick={removeLastNode}>Undo Last Point 'z'</button>
-        <button onClick={removeLastGroup}>Delete Last Pyramid 'x'</button>
-        {/* <FormControlLabel
+        {!showControls && (
+          <button onClick={() => setShowControls(true)}>controls</button>
+        )}
+
+        {showControls && (
+          <>
+            <button onClick={onShowCheatSheet}>Info 'i'</button>
+            <button onClick={() => setShowControls(false)}>
+              Hide Controls
+            </button>
+            <label>
+              width:
+              <input
+                onChange={(e) => setWidth(e.target.value)}
+                maxLength="4"
+                size="4"
+                type="number"
+                value={width}
+              />
+            </label>
+            <label>
+              height:
+              <input
+                onChange={(e) => setHeight(e.target.value)}
+                maxLength="4"
+                size="4"
+                type="number"
+                value={height}
+              />
+            </label>
+            <button onClick={toggleEditing}>Add Pyramid 'p'</button>
+            <button onClick={removeLastNode}>Undo Last Point 'z'</button>
+            <button onClick={removeLastGroup}>Delete Last Pyramid 'x'</button>
+            {/* <FormControlLabel
           control={
-            <Switch
+              <Switch
               checked={doAnimate}
               onChange={onDoAnimateChange}
               name="checkedA"
-            />
-          }
-          label="Animate"
+              />
+            }
+            label="Animate"
         /> */}
-        <StyledFormControl component="fieldset">
-          <FormLabel component="legend">Animation Type</FormLabel>
-          <RadioGroup
-            aria-label="animation index"
-            name="animIndex"
-            value={animationIndex}
-            onChange={onAnimChange}
-          >
-            <FormControlLabel value={0} control={<Radio />} label="None" />
-            <FormControlLabel value={1} control={<Radio />} label="Anim 1" />
-            <FormControlLabel value={2} control={<Radio />} label="Anim 2" />
-            <FormControlLabel value={3} control={<Radio />} label="Anim 3" />
-          </RadioGroup>
-        </StyledFormControl>
-        <button onClick={save_as_svg}>Save SVG 's'</button>
+            <StyledFormControl component="fieldset">
+              <FormLabel component="legend">Animation Type</FormLabel>
+              <RadioGroup
+                aria-label="animation index"
+                name="animIndex"
+                value={animationIndex}
+                onChange={onAnimChange}
+              >
+                <FormControlLabel value={0} control={<Radio />} label="None" />
+                <FormControlLabel
+                  value={1}
+                  control={<Radio />}
+                  label="Anim 1"
+                />
+                <FormControlLabel
+                  value={2}
+                  control={<Radio />}
+                  label="Anim 2"
+                />
+                <FormControlLabel
+                  value={3}
+                  control={<Radio />}
+                  label="Anim 3"
+                />
+              </RadioGroup>
+            </StyledFormControl>
+            <button onClick={save_as_svg}>Save SVG 's'</button>
+          </>
+        )}
       </ControlsStyle>
     </>
   );

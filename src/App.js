@@ -77,8 +77,6 @@ export default function App() {
               uid={"t" + index}
               isEditing={isEditing}
               animationIndex={animationIndex}
-              isAnimating={true}
-              isAnimating2={true}
             />
           </g>
         ))}
