@@ -37,9 +37,10 @@ export const Controls = ({
 
   useHotkeys("i", () => setShowInfo((prev) => !prev));
   useHotkeys("h", () => setShowControls((prev) => !prev));
+  useHotkeys("0", () => setAnimationIndex(0));
   useHotkeys("1", () => setAnimationIndex(1));
-  useHotkeys("2", () => setAnimationIndex(1));
-  useHotkeys("3", () => setAnimationIndex(1));
+  useHotkeys("2", () => setAnimationIndex(2));
+  useHotkeys("3", () => setAnimationIndex(3));
   useHotkeys("p", () => toggleEditing());
   useHotkeys("z", () => removeLastNode());
   useHotkeys("x", () => removeLastGroup());
@@ -198,7 +199,7 @@ const ControlsStyle = styled.div`
   fieldset {
     border-color: white;
     legend {
-      color: #aaa;
+      color: #aaa !important;
     }
   }
 
@@ -210,28 +211,4 @@ const ControlsStyle = styled.div`
       color: white;
     }
   }
-
-  /* a {
-    color: white;
-  }
-
-  button {
-    margin-right: 10px;
-    text-align: left;
-    border: none;
-    background: yellow;
-    font-weight: bold;
-    padding: 3px 0;
-    margin: 3px 0;
-    cursor: pointer;
-  }
-  label {
-    color: white;
-    margin: 5px 0;
-  }
-  input {
-    width: 50px;
-    margin-right: 10px;
-    padding: 5px;
-  } */
 `;

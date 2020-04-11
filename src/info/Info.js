@@ -15,7 +15,7 @@ export const Info = ({ onClick }) => {
         </a>
         <Shortcuts>
           <div>
-            <span>"c"</span>: toggle this Cheatsheet
+            <span>"i"</span>: toggle this info thing
           </div>
           <div>
             <span>"h"</span>: toggle controls
@@ -31,6 +31,9 @@ export const Info = ({ onClick }) => {
           </div>
           <div>
             <span>"x"</span>: remove last pyramid
+          </div>
+          <div>
+            <span>"0, 1, 2, or 3"</span>: diff animations
           </div>
         </Shortcuts>
       </Sheet>
