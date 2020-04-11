@@ -18,6 +18,7 @@ import IconButton from "@material-ui/core/IconButton";
 // comps
 import { Info } from "../info/Info";
 import { Icon } from "@material-ui/core";
+import Microphone from "../microphone/Microphone";
 
 export const Controls = ({
   removeLastNode,
@@ -31,6 +32,7 @@ export const Controls = ({
   height,
   setAnimationIndex,
   animationIndex,
+  onVolumeChange,
 }) => {
   const [showControls, setShowControls] = useState(true);
   const [showInfo, setShowInfo] = useLocalStorage("showInfo", true);
@@ -66,6 +68,8 @@ export const Controls = ({
 
         {showControls && (
           <>
+            <Microphone onVolumeChange={onVolumeChange} />
+
             <div style={{ textAlign: "right", padding: 0, margin: 0 }}>
               <IconButton onClick={() => setShowControls(false)}>
                 <CloseIcon style={{ color: "white" }} />

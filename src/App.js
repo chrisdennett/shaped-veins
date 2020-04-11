@@ -14,6 +14,7 @@ export default function App() {
   const [height, setHeight] = useLocalStorage("height", 1080);
   const [currNodes, setCurrNodes] = useState([]);
   const [groups, setGroups] = useLocalStorage("groups", []);
+  const [volume, setVolume] = useState(0);
 
   const addNode = (x, y) => {
     if (!isEditing) return;
@@ -37,6 +38,8 @@ export default function App() {
 
   const toggleEditing = () => setIsEditing((prev) => !prev);
 
+  const onVolumeChange = setVolume;
+
   const controlsProps = {
     removeLastNode,
     removeLastGroup,
@@ -49,6 +52,7 @@ export default function App() {
     setAnimationIndex,
     animationIndex,
     save_as_svg,
+    onVolumeChange,
   };
 
   return (
@@ -75,6 +79,7 @@ export default function App() {
         {groups.map((group, index) => (
           <g key={"g-" + index}>
             <Pyramid
+              volume={volume}
               nodes={group}
               uid={"t" + index}
               isEditing={isEditing}

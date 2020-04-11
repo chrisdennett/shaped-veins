@@ -1,8 +1,15 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export const Triangle = ({ points, index, hue, animationIndex, isEditing }) => {
-  const triProps = { points, index, hue };
+export const Triangle = ({
+  points,
+  index,
+  hue,
+  animationIndex,
+  isEditing,
+  volume,
+}) => {
+  const triProps = { points, index, hue, volume };
 
   if (animationIndex === 1) return <Anim1 {...triProps} />;
   if (animationIndex === 2) return <Anim2 {...triProps} />;
