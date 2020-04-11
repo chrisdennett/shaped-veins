@@ -1,18 +1,25 @@
 import React from "react";
 import styled from "styled-components";
+import Button from "@material-ui/core/Button";
 
 export const Info = ({ onClick }) => {
   return (
     <Holder onClick={onClick}>
       <Sheet>
         <h1>Info</h1>
-        <a
+
+        <Button
+          color="secondary"
+          variant="outlined"
+          href="#contained-buttons"
           href={"https://artfly.io/projector-shape-mapping-thing/"}
           target={"_blank"}
           rel="noreferrer"
+          style={{ marginBottom: 10, width: "100%" }}
         >
-          Info
-        </a>
+          Bit about what this is...
+        </Button>
+
         <Shortcuts>
           <div>
             <span>"i"</span>: toggle this info thing
@@ -64,6 +71,7 @@ const Sheet = styled.div`
 
   h1 {
     margin: 5px 0;
+    text-align: center;
   }
 `;
 
