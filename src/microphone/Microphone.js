@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import VolumeAnalyser from "./VolumeAnalyser";
 
-export const Microphone = ({ onVolumeChange }) => {
+export const Microphone = ({ onVolumeChange, getMic }) => {
   const [audio, setAudio] = useState(null);
-  const [getMic, setGetMic] = useState(false);
 
   useEffect(() => {
     if (!getMic) {
-      stopMicrophone();
+      if (!audio) return;
+      audio.getTracks().forEach((track) => track.stop());
+      setAudio(null);
     } else {
       async function getMicrophone() {
         const audio = await navigator.mediaDevices.getUserMedia({
@@ -20,31 +21,12 @@ export const Microphone = ({ onVolumeChange }) => {
     }
   }, [getMic]);
 
-  const stopMicrophone = () => {
-    if (!audio) return;
-    audio.getTracks().forEach((track) => track.stop());
-    setAudio(null);
-  };
-
-  const toggleMicrophone = () => {
-    if (audio) {
-      setGetMic(false);
-    } else {
-      setGetMic(true);
-    }
-  };
-
   const onVolumeUpdate = (volume) => {
     onVolumeChange(volume);
   };
 
   return (
-    <>
-      <button onClick={toggleMicrophone}>
-        {audio ? "Stop microphone" : "Get microphone input"}
-      </button>
-      {audio && <VolumeAnalyser audio={audio} onUpdate={onVolumeUpdate} />}
-    </>
+    <>{audio && <VolumeAnalyser audio={audio} onUpdate={onVolumeUpdate} />}</>
   );
 };
 

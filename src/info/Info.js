@@ -11,7 +11,6 @@ export const Info = ({ onClick }) => {
         <Button
           color="secondary"
           variant="outlined"
-          href="#contained-buttons"
           href={"https://artfly.io/projector-shape-mapping-thing/"}
           target={"_blank"}
           rel="noreferrer"
@@ -28,9 +27,6 @@ export const Info = ({ onClick }) => {
             <span>"h"</span>: toggle controls
           </div>
           <div>
-            <span>"a"</span>: toggle animation
-          </div>
-          <div>
             <span>"e"</span>: toggle editing
           </div>
           <div>
@@ -40,7 +36,7 @@ export const Info = ({ onClick }) => {
             <span>"x"</span>: remove last pyramid
           </div>
           <div>
-            <span>"0, 1, 2, or 3"</span>: diff animations
+            <span>"n, a, b, c, d"</span>: diff animations
           </div>
         </Shortcuts>
       </Sheet>

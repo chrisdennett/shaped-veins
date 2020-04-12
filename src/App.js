@@ -14,7 +14,7 @@ export default function App() {
   const [height, setHeight] = useLocalStorage("height", 1080);
   const [currNodes, setCurrNodes] = useState([]);
   const [groups, setGroups] = useLocalStorage("groups", []);
-  const [volume, setVolume] = useState(0);
+  const [volume, setVolume] = useState({});
 
   const addNode = (x, y) => {
     if (!isEditing) return;

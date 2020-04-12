@@ -17,7 +17,6 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 // comps
 import { Info } from "../info/Info";
-import { Icon } from "@material-ui/core";
 import Microphone from "../microphone/Microphone";
 
 export const Controls = ({
@@ -36,24 +35,31 @@ export const Controls = ({
 }) => {
   const [showControls, setShowControls] = useState(true);
   const [showInfo, setShowInfo] = useLocalStorage("showInfo", true);
+  const [minVolume, setMinVolume] = useLocalStorage("minVolume", 0.1);
+  const [maxVolume, setMaxVolume] = useLocalStorage("maxVolume", 0.7);
 
   useHotkeys("i", () => setShowInfo((prev) => !prev));
   useHotkeys("h", () => setShowControls((prev) => !prev));
-  useHotkeys("0", () => setAnimationIndex(0));
-  useHotkeys("1", () => setAnimationIndex(1));
-  useHotkeys("2", () => setAnimationIndex(2));
-  useHotkeys("3", () => setAnimationIndex(3));
-  useHotkeys("p", () => toggleEditing());
+  useHotkeys("n", () => setAnimationIndex(0));
+  useHotkeys("a", () => setAnimationIndex(1));
+  useHotkeys("b", () => setAnimationIndex(2));
+  useHotkeys("c", () => setAnimationIndex(3));
+  useHotkeys("d", () => setAnimationIndex(4));
+  useHotkeys("e", () => toggleEditing());
   useHotkeys("z", () => removeLastNode());
   useHotkeys("x", () => removeLastGroup());
   useHotkeys("s", () => save_as_svg());
 
   const onShowCheatSheet = () => setShowInfo(true);
   const onInfoClick = () => setShowInfo(false);
-  const setIsEditing = () => console.log("toggle Editing");
 
   const onAnimChange = (e) => {
-    setAnimationIndex(parseInt(e.target.value));
+    const newAnimIndex = e.target.value;
+
+    if (newAnimIndex === 4) {
+    }
+
+    setAnimationIndex(parseInt(newAnimIndex));
   };
 
   return (
@@ -68,7 +74,16 @@ export const Controls = ({
 
         {showControls && (
           <>
-            <Microphone onVolumeChange={onVolumeChange} />
+            <Microphone
+              onVolumeChange={(vol) =>
+                onVolumeChange({
+                  vol,
+                  minVolume: parseFloat(minVolume),
+                  maxVolume: parseFloat(maxVolume),
+                })
+              }
+              getMic={animationIndex === 4}
+            />
 
             <div style={{ textAlign: "right", padding: 0, margin: 0 }}>
               <IconButton onClick={() => setShowControls(false)}>
@@ -146,21 +161,52 @@ export const Controls = ({
                   <FormControlLabel
                     value={1}
                     control={<Radio />}
-                    label="Anim 1"
+                    label="Anim A"
                   />
                   <FormControlLabel
                     value={2}
                     control={<Radio />}
-                    label="Anim 2"
+                    label="Anim B"
                   />
                   <FormControlLabel
                     value={3}
                     control={<Radio />}
-                    label="Anim 3"
+                    label="Anim C"
+                  />
+                  <FormControlLabel
+                    value={4}
+                    control={<Radio />}
+                    label="Wall Shouter"
                   />
                 </RadioGroup>
               </FormControl>
             </Control>
+
+            {animationIndex === 4 && (
+              <>
+                <Control>
+                  <TextFieldStyled
+                    label="Min Volume"
+                    value={minVolume}
+                    onChange={(e) => setMinVolume(e.target.value)}
+                    variant="outlined"
+                    size="small"
+                  />
+                </Control>
+                <Control>
+                  <TextFieldStyled
+                    label="Max Volume"
+                    type={"number"}
+                    min={0}
+                    max={1}
+                    value={maxVolume}
+                    onChange={(e) => setMaxVolume(e.target.value)}
+                    variant="outlined"
+                    size="small"
+                  />
+                </Control>
+              </>
+            )}
 
             <Control>
               <Button size="small" variant="contained" onClick={save_as_svg}>

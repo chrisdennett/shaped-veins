@@ -14,6 +14,7 @@ export const Triangle = ({
   if (animationIndex === 1) return <Anim1 {...triProps} />;
   if (animationIndex === 2) return <Anim2 {...triProps} />;
   if (animationIndex === 3) return <Anim3 {...triProps} />;
+  if (animationIndex === 4) return <Anim4 {...triProps} />;
 
   return (
     <g>
@@ -110,6 +111,37 @@ const Anim3 = ({ points, index, hue }) => {
         }}
         stroke={"white"}
         strokeWidth={5}
+      />
+    </g>
+  );
+};
+
+const Anim4 = ({ points, index, volume }) => {
+  const { vol, minVolume, maxVolume } = volume;
+
+  // const topHue = 0; // red
+  // const bottomHue = 60; // yellow
+  const minVol = minVolume + index * 0.1;
+  console.log("maxVol, maxVolume: ", volume);
+  const volRange = maxVolume - minVol;
+  const volInc = 1 / volRange;
+
+  const loudness = minVol + vol * volInc;
+  const hue = 60 - loudness * 60;
+
+  let brightness;
+  if (vol < minVol) brightness = 0;
+  else brightness = 12 + index * 20;
+
+  // TODO: set bands for green, yellow, orange,
+
+  return (
+    <g>
+      <path
+        stroke={"black"}
+        strokeWidth={4}
+        d={`M ${points[0].x},${points[0].y} L ${points[1].x},${points[1].y} L ${points[2].x},${points[2].y} Z`}
+        fill={`hsl(${hue}, ${100}%, ${brightness}%)`}
       />
     </g>
   );
