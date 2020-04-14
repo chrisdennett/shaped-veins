@@ -17,74 +17,42 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 // comps
 import { Info } from "../info/Info";
-import Microphone from "../microphone/Microphone";
 
 export const Controls = ({
+  clearBounds,
   removeLastNode,
-  removeLastGroup,
   toggleEditing,
   save_as_svg,
   isEditing,
-  setWidth,
-  setHeight,
-  width,
-  height,
-  setAnimationIndex,
-  animationIndex,
-  onVolumeChange,
 }) => {
-  const [showControls, setShowControls] = useState(true);
+  const [showControls, setShowControls] = useState(false);
   const [showInfo, setShowInfo] = useLocalStorage("showInfo", true);
-  const [minVolume, setMinVolume] = useLocalStorage("minVolume", 0.1);
-  const [maxVolume, setMaxVolume] = useLocalStorage("maxVolume", 0.7);
 
   useHotkeys("i", () => setShowInfo((prev) => !prev));
   useHotkeys("h", () => setShowControls((prev) => !prev));
-  useHotkeys("n", () => setAnimationIndex(0));
-  useHotkeys("a", () => setAnimationIndex(1));
-  useHotkeys("b", () => setAnimationIndex(2));
-  useHotkeys("c", () => setAnimationIndex(3));
-  useHotkeys("d", () => setAnimationIndex(4));
   useHotkeys("e", () => toggleEditing());
   useHotkeys("z", () => removeLastNode());
-  useHotkeys("x", () => removeLastGroup());
+  useHotkeys("x", () => clearBounds());
   useHotkeys("s", () => save_as_svg());
 
   const onShowCheatSheet = () => setShowInfo(true);
   const onInfoClick = () => setShowInfo(false);
 
-  const onAnimChange = (e) => {
-    const newAnimIndex = e.target.value;
-
-    if (newAnimIndex === 4) {
-    }
-
-    setAnimationIndex(parseInt(newAnimIndex));
-  };
-
   return (
     <>
       {showInfo && <Info onClick={onInfoClick} />}
-      <ControlsStyle showControls={showControls}>
+      <ControlsStyle showControls={showControls} isOpen={showControls}>
         {!showControls && (
-          <IconButton onClick={() => setShowControls(true)}>
-            <MenuIcon style={{ color: "#555" }} />
+          <IconButton
+            onClick={() => setShowControls(true)}
+            style={{ width: 30, height: 30, padding: 0 }}
+          >
+            <MenuIcon style={{ color: "#fff", padding: 0 }} />
           </IconButton>
         )}
 
         {showControls && (
           <>
-            <Microphone
-              onVolumeChange={(vol) =>
-                onVolumeChange({
-                  vol,
-                  minVolume: parseFloat(minVolume),
-                  maxVolume: parseFloat(maxVolume),
-                })
-              }
-              getMic={animationIndex === 4}
-            />
-
             <div style={{ textAlign: "right", padding: 0, margin: 0 }}>
               <IconButton onClick={() => setShowControls(false)}>
                 <CloseIcon style={{ color: "white" }} />
@@ -102,24 +70,6 @@ export const Controls = ({
             </Control>
 
             <Control>
-              <TextFieldStyled
-                label="Width"
-                value={width}
-                onChange={(e) => setWidth(e.target.value)}
-                variant="outlined"
-                size="small"
-              />
-            </Control>
-            <Control>
-              <TextFieldStyled
-                label="Height"
-                value={height}
-                onChange={(e) => setHeight(e.target.value)}
-                variant="outlined"
-                size="small"
-              />
-            </Control>
-            <Control>
               <Button
                 size="small"
                 variant="contained"
@@ -135,78 +85,10 @@ export const Controls = ({
               </Button>
             </Control>
             <Control>
-              <Button
-                size="small"
-                variant="contained"
-                onClick={removeLastGroup}
-              >
-                Delete Last Pyramid 'x'
+              <Button size="small" variant="contained" onClick={clearBounds}>
+                Clear 'x'
               </Button>
             </Control>
-
-            <Control>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Animation Type</FormLabel>
-                <RadioGroup
-                  aria-label="animation index"
-                  name="animIndex"
-                  value={animationIndex}
-                  onChange={onAnimChange}
-                >
-                  <FormControlLabel
-                    value={0}
-                    control={<Radio />}
-                    label="None"
-                  />
-                  <FormControlLabel
-                    value={1}
-                    control={<Radio />}
-                    label="Anim A"
-                  />
-                  <FormControlLabel
-                    value={2}
-                    control={<Radio />}
-                    label="Anim B"
-                  />
-                  <FormControlLabel
-                    value={3}
-                    control={<Radio />}
-                    label="Anim C"
-                  />
-                  <FormControlLabel
-                    value={4}
-                    control={<Radio />}
-                    label="Wall Shouter"
-                  />
-                </RadioGroup>
-              </FormControl>
-            </Control>
-
-            {animationIndex === 4 && (
-              <>
-                <Control>
-                  <TextFieldStyled
-                    label="Min Volume"
-                    value={minVolume}
-                    onChange={(e) => setMinVolume(e.target.value)}
-                    variant="outlined"
-                    size="small"
-                  />
-                </Control>
-                <Control>
-                  <TextFieldStyled
-                    label="Max Volume"
-                    type={"number"}
-                    min={0}
-                    max={1}
-                    value={maxVolume}
-                    onChange={(e) => setMaxVolume(e.target.value)}
-                    variant="outlined"
-                    size="small"
-                  />
-                </Control>
-              </>
-            )}
 
             <Control>
               <Button size="small" variant="contained" onClick={save_as_svg}>
@@ -220,9 +102,9 @@ export const Controls = ({
   );
 };
 
-const TextFieldStyled = mStyled(TextField)({
-  color: "white",
-});
+// const TextFieldStyled = mStyled(TextField)({
+//   color: "white",
+// });
 
 const Control = styled.div`
   margin-bottom: 15px;
@@ -235,14 +117,15 @@ const Control = styled.div`
 `;
 
 const ControlsStyle = styled.div`
-  padding: 0 10px;
-  border-radius: 0px 0 10px 0;
   position: absolute;
+  z-index: 1;
+  border-radius: 0px 0 10px 0;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   color: white;
-  width: ${(props) => (props.showControls ? "210px" : "50px")};
+  padding: ${(props) => (props.isOpen ? "0 10px" : "0 0")};
+  width: ${(props) => (props.showControls ? "210px" : "30px")};
   background: rgba(0, 0, 0, 0.8);
 
   fieldset {

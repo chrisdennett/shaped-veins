@@ -3,106 +3,51 @@ import { saveAs } from "file-saver";
 import styled from "styled-components";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 // comps
-import { Pyramid } from "./Pyramid";
-import { EditCrossHairs } from "./EditCrosshairs";
 import { Controls } from "./controls/Controls";
+import Display from "./display/Display";
+import ShapeMaker from "./shapeMaker/ShapeMaker";
 
 export default function App() {
-  const [animationIndex, setAnimationIndex] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [width, setWidth] = useLocalStorage("width", 1920);
-  const [height, setHeight] = useLocalStorage("height", 1080);
-  const [currNodes, setCurrNodes] = useState([]);
-  const [groups, setGroups] = useLocalStorage("groups", []);
-  const [volume, setVolume] = useState({});
+  const [bounds, setBounds] = useLocalStorage("bounds", []);
 
-  const addNode = (x, y) => {
-    if (!isEditing) return;
-    const isPeak = currNodes.length === 0;
-    const node = { x, y, isPeak };
-    if (currNodes.length === 3) {
-      setGroups((prevGroups) => [...prevGroups, [...currNodes, node]]);
-      setCurrNodes([]);
-    } else {
-      setCurrNodes((prevArr) => [...prevArr, node]);
-    }
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  const updateBounds = (newBounds) => {
+    setBounds(newBounds);
   };
 
   const removeLastNode = () => {
-    setCurrNodes((prev) => prev.slice(0, prev.length - 1));
+    setBounds((prev) => [...prev].slice(0, prev.length - 1));
   };
 
-  const removeLastGroup = () => {
-    setGroups((prev) => prev.slice(0, prev.length - 1));
+  const clearBounds = () => {
+    setBounds([]);
   };
 
   const toggleEditing = () => setIsEditing((prev) => !prev);
 
-  const onVolumeChange = setVolume;
-
   const controlsProps = {
-    removeLastNode,
-    removeLastGroup,
     isEditing,
+    removeLastNode,
+    clearBounds,
     toggleEditing,
-    setWidth,
-    setHeight,
-    width,
-    height,
-    setAnimationIndex,
-    animationIndex,
     save_as_svg,
-    onVolumeChange,
   };
 
   return (
     <Container>
       <Controls {...controlsProps} />
-
-      <SVG
-        isEditing={isEditing}
-        width={width > 0 ? width : 1}
-        height={height > 0 ? height : 1}
-        id="svg"
-        xmlns="http://www.w3.org/2000/svg"
-        onClick={(e) => addNode(e.clientX, e.clientY)}
-      >
-        <rect
-          x={0}
-          y={0}
+      {isEditing && (
+        <ShapeMaker
           width={width}
           height={height}
-          stroke={"none"}
-          fill={"black"}
+          bounds={bounds}
+          updateBounds={updateBounds}
         />
-
-        {groups.map((group, index) => (
-          <g key={"g-" + index}>
-            <Pyramid
-              volume={volume}
-              nodes={group}
-              uid={"t" + index}
-              isEditing={isEditing}
-              animationIndex={animationIndex}
-            />
-          </g>
-        ))}
-
-        <g>
-          {currNodes.map((node, index) => (
-            <circle
-              key={index}
-              stroke={node.isPeak ? "red" : "yellow"}
-              cx={node.x}
-              cy={node.y}
-              fill={node.isPeak ? "red" : "yellow"}
-              r={6}
-            />
-          ))}
-        </g>
-
-        {isEditing && <EditCrossHairs width={width} height={height} />}
-      </SVG>
+      )}
+      <Display width={width} height={height} bounds={bounds} />
     </Container>
   );
 }
@@ -112,17 +57,6 @@ const Container = styled.div`
   height: 100vh;
   background: white;
   overflow: hidden;
-`;
-
-const SVG = styled.svg`
-  background: black;
-  line-height: 0;
-  stroke: white;
-  stroke-width: 2px;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  cursor: ${(props) => (props.isEditing ? "crosshair" : "inherit")};
 `;
 
 // helpers
