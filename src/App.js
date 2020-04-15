@@ -9,13 +9,32 @@ import ShapeMaker from "./shapeMaker/ShapeMaker";
 
 export default function App() {
   const [reRunId, setReRunId] = useState(0);
-  const [isDrawingOuterShape, setIsDrawingOuterShape] = useState(false);
   const [isEditing, setIsEditing] = useState(true);
   const [bounds, setBounds] = useLocalStorage("bounds", []);
-  const [startPoints, setStartPoints] = useLocalStorage("startPoints", []);
+  const [isAddingBounds, setIsAddingBounds] = useState(false);
+  const [startPoints, setStartPoints] = useLocalStorage("startPoints", null);
+  const [isAddingStartPoints, setIsAddingStartPoints] = useState(false);
+  const [obstaclePoints, setObstaclePoints] = useLocalStorage(
+    "obstacles",
+    null
+  );
+  const [isAddingObstacles, setIsAddingObstacles] = useState(false);
 
   const width = window.innerWidth;
   const height = window.innerHeight;
+
+  if (startPoints === null) {
+    setStartPoints([[100, 100]]);
+  }
+
+  if (bounds === null) {
+    setBounds([
+      [20, 20],
+      [width - 40, 20],
+      [width - 40, height - 40],
+      [20, height - 40],
+    ]);
+  }
 
   const updateBounds = (newBounds) => {
     setBounds(newBounds);
@@ -32,10 +51,15 @@ export default function App() {
   const drawOuterShape = (doDraw) => {
     if (doDraw) {
       setBounds([]);
-      setIsDrawingOuterShape(true);
+      setIsAddingBounds(true);
     } else {
-      setIsDrawingOuterShape(false);
+      setIsAddingBounds(false);
     }
+  };
+
+  const clearShape = () => {
+    setBounds([]);
+    setStartPoints([]);
   };
 
   const reRun = () => setReRunId((prev) => setReRunId(prev + 1));
@@ -43,16 +67,26 @@ export default function App() {
   const toggleEditing = () => setIsEditing((prev) => !prev);
 
   const controlsProps = {
+    setBounds,
+    setStartPoints,
+    setObstaclePoints,
+    setIsAddingBounds,
+    setIsAddingStartPoints,
+    setIsAddingObstacles,
     isEditing,
-    isDrawingOuterShape,
+    setIsEditing,
+    isAddingBounds,
+    isAddingStartPoints,
+    isAddingObstacles,
     removeLastNode,
     drawOuterShape,
     toggleEditing,
     save_as_svg,
     reRun,
+    clearShape,
   };
 
-  const showShapeMaker = isEditing || isDrawingOuterShape;
+  const showShapeMaker = isEditing || isAddingBounds;
 
   return (
     <Container>
@@ -62,7 +96,7 @@ export default function App() {
           width={width}
           height={height}
           bounds={bounds}
-          isDrawingOuterShape={isDrawingOuterShape}
+          isAddingBounds={isAddingBounds}
           isEditing={isEditing}
           updateBounds={updateBounds}
           updateStartPoints={updateStartPoints}

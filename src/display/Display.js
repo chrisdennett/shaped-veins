@@ -61,8 +61,7 @@ export default Display;
 
 // STYLES
 const Container = styled.div`
-  background: #fff;
-  background-image: url(./img/cutting-mat-tile.png);
+  background: #eee;
 `;
 
 const CanvasHolder = styled.div`
@@ -71,7 +70,7 @@ const CanvasHolder = styled.div`
 
 const CanvasStyled = styled.canvas``;
 
-const addStartNodes = (ctx, startPoints = [[150, 870]]) => {
+const addStartNodes = (ctx, startPoints) => {
   for (let pt of startPoints) {
     network.addNode(
       new Node(null, new Vec2(pt[0], pt[1]), true, ctx, Settings, undefined)

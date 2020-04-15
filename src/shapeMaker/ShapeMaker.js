@@ -9,7 +9,8 @@ const ShapeMaker = ({
   startPoints = [],
   updateBounds,
   updateStartPoints,
-  isDrawingOuterShape,
+  isAddingBounds,
+  isAddingStartPoints,
 }) => {
   const [indexToEdit, setIndexToEdit] = useState(null);
 
@@ -27,7 +28,7 @@ const ShapeMaker = ({
   }, [indexToEdit]);
 
   const addNode = (x, y) => {
-    if (!isDrawingOuterShape) return;
+    if (!isAddingBounds) return;
     const node = [x, y];
     updateBounds([...bounds, node]);
   };
@@ -50,7 +51,7 @@ const ShapeMaker = ({
       height={height > 0 ? height : 1}
       id="svg"
       xmlns="http://www.w3.org/2000/svg"
-      isAddingNodes={isDrawingOuterShape}
+      isAddingNodes={isAddingBounds}
       onMouseUp={() => setIndexToEdit(null)}
       onClick={(e) => addNode(e.clientX, e.clientY)}
     >
@@ -59,9 +60,7 @@ const ShapeMaker = ({
           const isLastNode = index === bounds.length - 1;
           const isFirstNode = index === 0;
           const nextNode = bounds[isLastNode ? 0 : index + 1];
-          let nodeColour = "blue";
-          if (isFirstNode) nodeColour = "green";
-          if (isLastNode) nodeColour = "red";
+          const nodeColour = "blue";
           const lastNode = bounds[bounds.length - 1];
 
           return (
@@ -114,7 +113,7 @@ const ShapeMaker = ({
           );
         })}
       </g>
-      {isDrawingOuterShape && <EditCrossHairs width={width} height={height} />}
+      {isAddingBounds && <EditCrossHairs width={width} height={height} />}
     </SVG>
   );
 };

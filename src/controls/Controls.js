@@ -3,133 +3,178 @@ import styled from "styled-components";
 import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 // ui
-import InfoIcon from "@material-ui/icons/InfoRounded";
-import MenuIcon from "@material-ui/icons/Menu";
-import CloseIcon from "@material-ui/icons/Close";
-import Button from "@material-ui/core/Button";
+import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
+import EditIcon from "@material-ui/icons/Edit";
+import RefreshIcon from "@material-ui/icons/Refresh";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import DoneIcon from "@material-ui/icons/Done";
+import AddIcon from "@material-ui/icons/Add";
+//
 import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
 // comps
 import { Info } from "../info/Info";
 
 export const Controls = ({
+  setBounds,
+  setStartPoints,
+  setObstaclePoints,
+  setIsEditing,
   drawOuterShape,
   removeLastNode,
   toggleEditing,
   save_as_svg,
   isEditing,
+  isAddingBounds,
+  isAddingStartPoints,
+  isAddingObstacles,
   reRun,
-  isDrawingOuterShape,
+  setIsAddingBounds,
+  setIsAddingStartPoints,
+  setIsAddingObstacles,
 }) => {
-  const [showControls, setShowControls] = useState(true);
   const [showInfo, setShowInfo] = useLocalStorage("showInfo", true);
-  const isInEditMode = isEditing || isDrawingOuterShape;
+  // const isInEditMode = isEditing || isDrawingOuterShape;
 
-  useHotkeys("i", () => setShowInfo((prev) => !prev));
-  useHotkeys("h", () => setShowControls((prev) => !prev));
-  useHotkeys("e", () => onDoneClick());
-  useHotkeys("r", () => reRun());
-  useHotkeys("z", () => removeLastNode());
-  useHotkeys("x", () => drawOuterShape(true));
-  useHotkeys("s", () => save_as_svg());
-
-  const onShowCheatSheet = () => setShowInfo(true);
-  const onInfoClick = () => setShowInfo(false);
+  // useHotkeys("i", () => setShowInfo((prev) => !prev));
+  // useHotkeys("e", () => onDoneClick());
+  // useHotkeys("r", () => reRun());
+  // useHotkeys("z", () => removeLastNode());
+  // useHotkeys("x", () => drawOuterShape(true));
+  // useHotkeys("s", () => save_as_svg());
 
   const onDoneClick = () => {
-    if (isEditing) {
-      toggleEditing();
-    } else if (isDrawingOuterShape) {
-      drawOuterShape(false);
-    } else {
-      toggleEditing();
+    if (isAddingBounds) setIsAddingBounds(false);
+    else if (isAddingObstacles) setIsAddingObstacles(false);
+    else if (isAddingStartPoints) setIsAddingStartPoints(false);
+    else {
+      setIsEditing(false);
     }
   };
 
-  if (isInEditMode) {
-    return (
-      <DoneButtonStyle>
-        <Button
-          size="small"
-          variant="contained"
-          onClick={onDoneClick}
-          style={{ background: "green", marginRight: 10, color: "white" }}
-        >
-          DONE 'e'
-        </Button>
-        <Button size="small" variant="contained" onClick={removeLastNode}>
-          Remove Last Point 'z'
-        </Button>
-      </DoneButtonStyle>
-    );
-  }
+  // if (isInEditMode) {
+  //   return (
+  //     <DoneButtonStyle>
+  //       <Button size="small" variant="contained" onClick={removeLastNode}>
+  //         Remove Last Point 'z'
+  //       </Button>
+  //     </DoneButtonStyle>
+  //   );
+  // }
+
+  const isAddingNodes =
+    isAddingBounds || isAddingStartPoints || isAddingObstacles;
 
   return (
     <>
-      {showInfo && <Info onClick={onInfoClick} />}
-      <ControlsStyle showControls={showControls} isOpen={showControls}>
-        {!showControls && (
-          <IconButton
-            onClick={() => setShowControls(true)}
-            style={{ width: 30, height: 30, padding: 0 }}
-          >
-            <MenuIcon style={{ color: "#fff", padding: 0 }} />
-          </IconButton>
+      {showInfo && <Info onClick={() => setShowInfo(false)} />}
+      <StyledControlBar>
+        {!isEditing && (
+          <StyledButtonSet>
+            <IconButton onClick={toggleEditing} aria-label="edit">
+              <EditIcon />
+            </IconButton>
+            <IconButton onClick={reRun} aria-label="refresh">
+              <RefreshIcon />
+            </IconButton>
+            <IconButton onClick={() => setShowInfo(true)} aria-label="help">
+              <HelpOutlineIcon />
+            </IconButton>
+          </StyledButtonSet>
         )}
 
-        {showControls && (
+        {isEditing && (
           <>
-            <div style={{ textAlign: "right", padding: 0, margin: 0 }}>
-              <IconButton onClick={() => setShowControls(false)}>
-                <CloseIcon style={{ color: "white" }} />
+            <StyledButtonSet>
+              <IconButton
+                onClick={onDoneClick}
+                aria-label="done"
+                style={{ background: "green", color: "white" }}
+              >
+                <DoneIcon />
               </IconButton>
-            </div>
-            <Control>
-              <Button
-                size="small"
-                variant="contained"
-                startIcon={<InfoIcon />}
-                onClick={onShowCheatSheet}
+            </StyledButtonSet>
+
+            {!isAddingNodes && (
+              <StyledButtonSet showDividerAbove>
+                <IconButton
+                  onClick={() => setIsAddingStartPoints(true)}
+                  aria-label="done"
+                  style={{ background: "yellow", color: "black" }}
+                >
+                  <AddIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() => setIsAddingBounds(true)}
+                  aria-label="done"
+                  style={{ background: "blue", color: "white" }}
+                >
+                  <AddIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() => setIsAddingObstacles(true)}
+                  aria-label="done"
+                  style={{ background: "red", color: "white" }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </StyledButtonSet>
+            )}
+            {/* DELETE BUTTS */}
+            <StyledButtonSet showDividerAbove>
+              <IconButton
+                onClick={() => setBounds([])}
+                aria-label="done"
+                style={{ background: "blue", color: "white" }}
               >
-                Info 'i'
-              </Button>
-            </Control>
-
-            <Control>
-              <Button size="small" variant="contained" onClick={toggleEditing}>
-                Edit 'e'
-              </Button>
-            </Control>
-
-            <Control>
-              <Button size="small" variant="contained" onClick={reRun}>
-                Rerun 'r'
-              </Button>
-            </Control>
-
-            <Control>
-              <Button
-                size="small"
-                color={"secondary"}
-                variant="contained"
-                onClick={drawOuterShape}
-                startIcon={<DeleteIcon />}
+                <DeleteForeverIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => setStartPoints([])}
+                aria-label="done"
+                style={{ background: "yellow", color: "black" }}
               >
-                Remake Outer 'x'
-              </Button>
-            </Control>
-
-            {/* <Control>
-              <Button size="small" variant="contained" onClick={save_as_svg}>
-                Save SVG 's'
-              </Button>
-            </Control> */}
+                <DeleteForeverIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => setObstaclePoints([])}
+                aria-label="done"
+                style={{ background: "red", color: "white" }}
+              >
+                <DeleteForeverIcon />
+              </IconButton>
+            </StyledButtonSet>
           </>
         )}
-      </ControlsStyle>
+      </StyledControlBar>
     </>
   );
 };
+
+const StyledControlBar = styled.div`
+  position: fixed;
+  z-index: 9;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 5px;
+`;
+
+const StyledButtonSet = styled.div`
+  display: flex;
+  flex-direction: column;
+  border-top: ${(props) =>
+    props.showDividerAbove ? "1px solid grey" : "none"};
+  padding-top: ${(props) => (props.showDividerAbove ? "10px" : "none")};
+  margin-top: ${(props) => (props.showDividerAbove ? "20px" : "none")};
+  button {
+    margin: 5px 0;
+  }
+`;
 
 const Control = styled.div`
   margin-bottom: 15px;
