@@ -81,11 +81,11 @@ export const Controls = ({
 
             <StyledButtonSet showDividerAbove>
               <IconButton
-                onClick={() => setIsAddingStartPoints(true)}
+                onClick={() => setIsAddingStartPoints(!isAddingStartPoints)}
                 aria-label="done"
                 style={{ background: "yellow", color: "black" }}
               >
-                <AddIcon />
+                {isAddingStartPoints ? <DoneIcon /> : <AddIcon />}
               </IconButton>
               {!hasBounds && (
                 <IconButton
