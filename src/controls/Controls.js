@@ -9,6 +9,7 @@ import RefreshIcon from "@material-ui/icons/Refresh";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import DoneIcon from "@material-ui/icons/Done";
 import AddIcon from "@material-ui/icons/Add";
+import SaveIcon from "@material-ui/icons/Save";
 //
 import IconButton from "@material-ui/core/IconButton";
 // comps
@@ -28,6 +29,7 @@ export const Controls = ({
   isAddingStartPoints,
   isAddingObstacles,
   reRun,
+  onSave,
   setIsAddingBounds,
   setIsAddingStartPoints,
   setIsAddingObstacles,
@@ -37,6 +39,7 @@ export const Controls = ({
   useHotkeys("i", () => setShowInfo((prev) => !prev));
   useHotkeys("e", () => (isEditing ? onDoneClick() : setIsEditing(true)));
   useHotkeys("r", () => reRun());
+  useHotkeys("s", () => onSave());
   // useHotkeys("x", () => drawOuterShape(true));
   // useHotkeys("s", () => save_as_svg());
 
@@ -72,17 +75,21 @@ export const Controls = ({
   return (
     <>
       {showInfo && <Info onClick={() => setShowInfo(false)} />}
+
       <StyledControlBar>
         {!isEditing && (
           <StyledButtonSet>
+            <IconButton onClick={() => setShowInfo(true)} aria-label="help">
+              <HelpOutlineIcon />
+            </IconButton>
             <IconButton onClick={toggleEditing} aria-label="edit">
               <EditIcon />
             </IconButton>
             <IconButton onClick={reRun} aria-label="refresh">
               <RefreshIcon />
             </IconButton>
-            <IconButton onClick={() => setShowInfo(true)} aria-label="help">
-              <HelpOutlineIcon />
+            <IconButton onClick={onSave} aria-label="save">
+              <SaveIcon />
             </IconButton>
           </StyledButtonSet>
         )}
@@ -100,7 +107,7 @@ export const Controls = ({
                 onClick={() =>
                   setIsAddingOption("starts", !isAddingStartPoints)
                 }
-                aria-label="done"
+                aria-label="add start points"
                 style={{ background: "yellow", color: "black" }}
               >
                 {isAddingStartPoints ? <DoneIcon /> : <AddIcon />}
@@ -109,7 +116,7 @@ export const Controls = ({
               {showAddBoundsButt && (
                 <IconButton
                   onClick={() => setIsAddingOption("bounds", !isAddingBounds)}
-                  aria-label="done"
+                  aria-label="add bounds"
                   style={{ background: "blue", color: "white" }}
                 >
                   {isAddingBounds ? <DoneIcon /> : <AddIcon />}

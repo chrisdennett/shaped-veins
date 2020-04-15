@@ -19,6 +19,7 @@ const Display = ({
   obstacles,
   startPoints,
   reRunId,
+  setCanvasRef,
 }) => {
   useAnimationFrame(() => {
     network.update();
@@ -29,6 +30,7 @@ const Display = ({
 
   React.useEffect(() => {
     if (canvasRef) {
+      setCanvasRef(canvasRef);
       const ctx = canvasRef.current.getContext("2d");
       canvasRef.current.width = width;
       canvasRef.current.height = height;

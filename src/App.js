@@ -8,6 +8,7 @@ import Display from "./display/Display";
 import ShapeMaker from "./shapeMaker/ShapeMaker";
 
 export default function App() {
+  const [canvasRef, setCanvasRef] = useState(0);
   const [reRunId, setReRunId] = useState(0);
   const [isEditing, setIsEditing] = useState(true);
   const [bounds, setBounds] = useLocalStorage("bounds", []);
@@ -84,6 +85,7 @@ export default function App() {
     save_as_svg,
     reRun,
     clearShape,
+    onSave: () => saveCanvas(canvasRef.current),
   };
 
   const showShapeMaker = isEditing || isAddingBounds;
@@ -114,6 +116,7 @@ export default function App() {
         startPoints={startPoints}
         obstacles={obstacles}
         reRunId={reRunId}
+        setCanvasRef={setCanvasRef}
       />
     </Container>
   );
@@ -147,6 +150,12 @@ const get_svg_text = () => {
   `);
 
   return svg_data;
+};
+
+const saveCanvas = (canvas) => {
+  canvas.toBlob(function (blob) {
+    saveAs(blob, "artfly-shape-veins.png");
+  });
 };
 
 // const copyToClipboard = (str) => {

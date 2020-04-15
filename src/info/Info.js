@@ -13,7 +13,7 @@ export const Info = ({ onClick }) => {
           endIcon={<OpenInNewIcon />}
           color="default"
           variant="contained"
-          href={"https://artfly.io/projector-shape-mapping-thing/"}
+          href={"https://artfly.io/shaped-veins"}
           target={"_blank"}
           rel="noreferrer"
           style={{ marginBottom: 10, width: "100%" }}
@@ -27,6 +27,9 @@ export const Info = ({ onClick }) => {
           </div>
           <div>
             <span>"r"</span>: re-run
+          </div>
+          <div>
+            <span>"s"</span>: save
           </div>
           <div>
             <span>"i"</span>: toggle this info thing
