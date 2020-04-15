@@ -63,6 +63,9 @@ export default class Network {
           }
 
           break;
+
+        default:
+          break;
       }
     }
 
@@ -78,7 +81,7 @@ export default class Network {
         let isInsideAnyObstacle = false;
 
         // Only allow root nodes inside of defined bounds
-        if (this.bounds != undefined && this.bounds.length > 0) {
+        if (this.bounds !== undefined && this.bounds.length > 0) {
           for (let bound of this.bounds) {
             if (bound.contains(nextNode.position.x, nextNode.position.y)) {
               isInsideAnyBounds = true;
@@ -87,7 +90,7 @@ export default class Network {
         }
 
         // Don't allow any root nodes that are inside of an obstacle
-        if (this.obstacles != undefined && this.obstacles.length > 0) {
+        if (this.obstacles !== undefined && this.obstacles.length > 0) {
           for (let obstacle of this.obstacles) {
             if (obstacle.contains(nextNode.position.x, nextNode.position.y)) {
               isInsideAnyObstacle = true;
@@ -110,7 +113,7 @@ export default class Network {
       if (node.isTip && this.settings.EnableCanalization) {
         let currentNode = node;
 
-        while (currentNode.parent != null) {
+        while (currentNode.parent !== null) {
           // When there are multiple child nodes, use the thickest of them all
           if (currentNode.parent.thickness < currentNode.thickness + 0.07) {
             currentNode.parent.thickness = currentNode.thickness + 0.03;
@@ -123,35 +126,31 @@ export default class Network {
 
     // Remove any attractors that have been reached by their associated nodes
     for (let [attractorID, attractor] of this.attractors.entries()) {
-      switch (this.settings.VenationType) {
+      if (this.settings.VenationType === "Open") {
         // For open venation, remove the attractor as soon as any node reaches it
-        case "Open":
-          if (attractor.reached) {
+        if (attractor.reached) {
+          this.attractors.splice(attractorID, 1);
+        }
+      }
+
+      // For closed venation, remove the attractor only when all associated nodes have reached it
+      else {
+        if (attractor.influencingNodes.length > 0 && !attractor.fresh) {
+          let allNodesReached = true;
+
+          for (let node of attractor.influencingNodes) {
+            if (
+              node.position.distance(attractor.position) >
+              this.settings.KillDistance
+            ) {
+              allNodesReached = false;
+            }
+          }
+
+          if (allNodesReached) {
             this.attractors.splice(attractorID, 1);
           }
-
-          break;
-
-        // For closed venation, remove the attractor only when all associated nodes have reached it
-        case "Closed":
-          if (attractor.influencingNodes.length > 0 && !attractor.fresh) {
-            let allNodesReached = true;
-
-            for (let node of attractor.influencingNodes) {
-              if (
-                node.position.distance(attractor.position) >
-                this.settings.KillDistance
-              ) {
-                allNodesReached = false;
-              }
-            }
-
-            if (allNodesReached) {
-              this.attractors.splice(attractorID, 1);
-            }
-          }
-
-          break;
+        }
       }
     }
 
@@ -176,7 +175,7 @@ export default class Network {
   }
 
   drawBounds() {
-    if (this.settings.ShowBounds && this.bounds != undefined) {
+    if (this.settings.ShowBounds && this.bounds !== undefined) {
       for (let bound of this.bounds) {
         bound.draw();
       }
@@ -184,7 +183,7 @@ export default class Network {
   }
 
   drawObstacles() {
-    if (this.settings.ShowObstacles && this.obstacles != undefined) {
+    if (this.settings.ShowObstacles && this.obstacles !== undefined) {
       for (let obstacle of this.obstacles) {
         obstacle.draw();
       }
@@ -325,7 +324,7 @@ export default class Network {
     let isInsideAnyObstacle = false;
 
     // Only allow root nodes inside of defined bounds
-    if (this.bounds != undefined && this.bounds.length > 0) {
+    if (this.bounds !== undefined && this.bounds.length > 0) {
       for (let bound of this.bounds) {
         if (bound.contains(node.position.x, node.position.y)) {
           isInsideAnyBounds = true;
@@ -334,7 +333,7 @@ export default class Network {
     }
 
     // Don't allow any root nodes that are inside of an obstacle
-    if (this.obstacles != undefined && this.obstacles.length > 0) {
+    if (this.obstacles !== undefined && this.obstacles.length > 0) {
       for (let obstacle of this.obstacles) {
         if (obstacle.contains(node.position.x, node.position.y)) {
           isInsideAnyObstacle = true;

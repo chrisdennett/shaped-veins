@@ -30,7 +30,7 @@ export default class Node {
           this.ctx.strokeStyle = this.settings.Colors.TipColor;
           this.ctx.lineWidth = this.settings.TipThickness;
         } else {
-          if (this.color != undefined) {
+          if (this.color !== undefined) {
             this.ctx.strokeStyle = this.color;
           } else {
             this.ctx.strokeStyle = this.settings.Colors.BranchColor;

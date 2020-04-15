@@ -12,7 +12,7 @@ import Settings from "../core/Settings";
 
 let network;
 
-const Display = ({ width, height, bounds }) => {
+const Display = ({ width, height, bounds, isPaused }) => {
   useAnimationFrame(() => {
     network.update();
     network.draw();
@@ -29,16 +29,18 @@ const Display = ({ width, height, bounds }) => {
       network = new Network(ctx, Settings);
       resetNetwork();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width, height]);
 
   React.useEffect(() => {
     resetNetwork();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bounds]);
 
-  let resetNetwork = () => {
+  const resetNetwork = () => {
     const ctx = canvasRef.current.getContext("2d");
     network.reset();
-    network.bounds = getBounds({ ctx, bounds });
+    network.bounds = getBounds({ ctx, bounds, width, height });
     network.obstacles = getObstacles(ctx);
     network.attractors = getAttractors(ctx);
     addStartNode(ctx);
@@ -70,7 +72,6 @@ const CanvasHolder = styled.div`
 `;
 
 const CanvasStyled = styled.canvas`
-  border: red 1px solid;
   max-width: 100%;
   max-height: 100%;
 `;

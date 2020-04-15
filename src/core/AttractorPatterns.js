@@ -11,22 +11,23 @@ export function getRandomAttractors(
 ) {
   let attractors = [];
   let x, y;
-  let isInsideAnyBounds, isInsideAnyObstacle, isOnScreen;
+  let isInsideAnyBounds, isInsideAnyObstacle;
+  // let isOnScreen;
 
   for (let i = 0; i < numAttractors; i++) {
     x = random(window.innerWidth);
     y = random(window.innerHeight);
     isInsideAnyBounds = false;
     isInsideAnyObstacle = false;
-    isOnScreen = false;
+    // isOnScreen = false;
 
     // Only allow attractors that are in the viewport
-    if (x > 0 && x < window.innerWidth && y > 0 && y < window.innerHeight) {
-      isOnScreen = true;
-    }
+    // if (x > 0 && x < window.innerWidth && y > 0 && y < window.innerHeight) {
+    //   isOnScreen = true;
+    // }
 
     // Only allow root nodes inside of defined bounds
-    if (bounds != undefined && bounds.length > 0) {
+    if (bounds !== undefined && bounds.length > 0) {
       for (let bound of bounds) {
         if (bound.contains(x, y)) {
           isInsideAnyBounds = true;
@@ -35,7 +36,7 @@ export function getRandomAttractors(
     }
 
     // Don't allow any root nodes that are inside of an obstacle
-    if (obstacles != undefined && obstacles.length > 0) {
+    if (obstacles !== undefined && obstacles.length > 0) {
       for (let obstacle of obstacles) {
         if (obstacle.contains(x, y)) {
           isInsideAnyObstacle = true;
@@ -83,7 +84,7 @@ export function getGridOfAttractors(
       }
 
       // Only allow attractors inside of any of the defined bounds (if used)
-      if (bounds != undefined && bounds.length > 0) {
+      if (bounds !== undefined && bounds.length > 0) {
         for (let bound of bounds) {
           if (bound.contains(x, y)) {
             isInsideAnyBounds = true;
@@ -92,7 +93,7 @@ export function getGridOfAttractors(
       }
 
       // Don't allow any root nodes that are inside of an obstacle (if used)
-      if (obstacles != undefined && obstacles.length > 0) {
+      if (obstacles !== undefined && obstacles.length > 0) {
         for (let obstacle of obstacles) {
           if (obstacle.contains(x, y)) {
             isInsideAnyObstacle = true;

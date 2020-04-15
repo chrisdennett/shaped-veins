@@ -19,5 +19,5 @@ export const useAnimationFrame = (callback) => {
   React.useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
-  }, []); // Make sure the effect runs only once
+  }); // Make sure the effect runs only once
 };

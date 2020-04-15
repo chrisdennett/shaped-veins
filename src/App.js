@@ -8,7 +8,8 @@ import Display from "./display/Display";
 import ShapeMaker from "./shapeMaker/ShapeMaker";
 
 export default function App() {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isDrawingOuterShape, setIsDrawingOuterShape] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [bounds, setBounds] = useLocalStorage("bounds", []);
 
   const width = window.innerWidth;
@@ -22,28 +23,38 @@ export default function App() {
     setBounds((prev) => [...prev].slice(0, prev.length - 1));
   };
 
-  const clearBounds = () => {
-    setBounds([]);
+  const drawOuterShape = (doDraw) => {
+    if (doDraw) {
+      setBounds([]);
+      setIsDrawingOuterShape(true);
+    } else {
+      setIsDrawingOuterShape(false);
+    }
   };
 
   const toggleEditing = () => setIsEditing((prev) => !prev);
 
   const controlsProps = {
     isEditing,
+    isDrawingOuterShape,
     removeLastNode,
-    clearBounds,
+    drawOuterShape,
     toggleEditing,
     save_as_svg,
   };
 
+  const showShapeMaker = isEditing || isDrawingOuterShape;
+
   return (
     <Container>
       <Controls {...controlsProps} />
-      {isEditing && (
+      {showShapeMaker && (
         <ShapeMaker
           width={width}
           height={height}
           bounds={bounds}
+          isDrawingOuterShape={isDrawingOuterShape}
+          isEditing={isEditing}
           updateBounds={updateBounds}
         />
       )}

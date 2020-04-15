@@ -1,20 +1,20 @@
-import Defaults from './Defaults';
-import * as Vec2 from 'vec2';
+import Defaults from "./Defaults";
+import * as Vec2 from "vec2";
 
-let inside = require('point-in-polygon');
+let inside = require("point-in-polygon");
 
 export default class Path {
   constructor(polygon, type, ctx, settings) {
-    this.polygon = polygon;     // array of arrays containing coordinates defining a polygon ([[x0,y0],[x1,y1],...])
-    this.ctx = ctx;             // global canvas context
-    this.type = type;           // string either 'Bounds' or 'Obstacle'
+    this.polygon = polygon; // array of arrays containing coordinates defining a polygon ([[x0,y0],[x1,y1],...])
+    this.ctx = ctx; // global canvas context
+    this.type = type; // string either 'Bounds' or 'Obstacle'
 
-    this.transformedPolygon = polygon;  // Paths are initialized without any transformations by default
-    this.origin = {x:0, y:0};           // origin point used for translation
-    this.scale = 1;                     // multiplication factor for polygon coordinates
-    this.width = -1;                    // width of transformed polygon - will be calculated using this.calculateDimensions()
-    this.height = -1;                   // height of transformed polygon - will be calculated using this.calculateDimensions()
-    this.isCentered = false;            // whether or not to automatically translate to screen center
+    this.transformedPolygon = polygon; // Paths are initialized without any transformations by default
+    this.origin = { x: 0, y: 0 }; // origin point used for translation
+    this.scale = 1; // multiplication factor for polygon coordinates
+    this.width = -1; // width of transformed polygon - will be calculated using this.calculateDimensions()
+    this.height = -1; // height of transformed polygon - will be calculated using this.calculateDimensions()
+    this.isCentered = false; // whether or not to automatically translate to screen center
 
     this.settings = Object.assign({}, Defaults, settings);
 
@@ -36,9 +36,9 @@ export default class Path {
 
   // Absolute translation
   moveTo(x, y) {
-    if(this.isCentered) {
-      this.origin.x = x - this.width/2;
-      this.origin.y = y - this.height/2;
+    if (this.isCentered) {
+      this.origin.x = x - this.width / 2;
+      this.origin.y = y - this.height / 2;
     } else {
       this.origin.x = x;
       this.origin.y = y;
@@ -52,8 +52,8 @@ export default class Path {
     this.createTransformedPolygon();
     this.calculateDimensions();
 
-    if(this.isCentered) {
-      this.moveTo(window.innerWidth/2, window.innerHeight/2);
+    if (this.isCentered) {
+      this.moveTo(window.innerWidth / 2, window.innerHeight / 2);
     }
   }
 
@@ -61,14 +61,14 @@ export default class Path {
   getTotalLength() {
     let totalLength = 0;
 
-    for(let i=1; i<this.polygon.length; i++) {
+    for (let i = 1; i < this.polygon.length; i++) {
       totalLength += Vec2(
         this.polygon[i][0] * this.scale,
         this.polygon[i][1] * this.scale
       ).distance(
         Vec2(
-          this.polygon[i-1][0] * this.scale,
-          this.polygon[i-1][1] * this.scale
+          this.polygon[i - 1][0] * this.scale,
+          this.polygon[i - 1][1] * this.scale
         )
       );
     }
@@ -83,16 +83,16 @@ export default class Path {
       topMostCoordinate = this.transformedPolygon[0][1],
       bottomMostCoordinate = this.transformedPolygon[0][1];
 
-    for(let i=0; i<this.transformedPolygon.length; i++) {
-      if(this.transformedPolygon[i][0] < leftMostCoordinate) {
+    for (let i = 0; i < this.transformedPolygon.length; i++) {
+      if (this.transformedPolygon[i][0] < leftMostCoordinate) {
         leftMostCoordinate = this.transformedPolygon[i][0];
-      } else if(this.transformedPolygon[i][0] > rightMostCoordinate) {
+      } else if (this.transformedPolygon[i][0] > rightMostCoordinate) {
         rightMostCoordinate = this.transformedPolygon[i][0];
       }
 
-      if(this.transformedPolygon[i][1] < topMostCoordinate) {
+      if (this.transformedPolygon[i][1] < topMostCoordinate) {
         topMostCoordinate = this.transformedPolygon[i][1];
-      } else if(this.transformedPolygon[i][1] > bottomMostCoordinate) {
+      } else if (this.transformedPolygon[i][1] > bottomMostCoordinate) {
         bottomMostCoordinate = this.transformedPolygon[i][1];
       }
     }
@@ -105,59 +105,45 @@ export default class Path {
   createTransformedPolygon() {
     this.transformedPolygon = [];
 
-    for(let i=0; i<this.polygon.length; i++) {
-      this.transformedPolygon.push(
-        [
-          this.polygon[i][0] * this.scale + this.origin.x,
-          this.polygon[i][1] * this.scale + this.origin.y
-        ]
-      );
+    for (let i = 0; i < this.polygon.length; i++) {
+      this.transformedPolygon.push([
+        this.polygon[i][0] * this.scale + this.origin.x,
+        this.polygon[i][1] * this.scale + this.origin.y,
+      ]);
     }
   }
 
   draw() {
-    if(
-      this.settings.ShowBounds && this.type == 'Bounds' ||
-      this.settings.ShowObstacles && this.type == 'Obstacles'
+    if (
+      (this.settings.ShowBounds && this.type === "Bounds") ||
+      (this.settings.ShowObstacles && this.type === "Obstacles")
     ) {
       this.ctx.beginPath();
-      this.ctx.moveTo(this.transformedPolygon[0][0], this.transformedPolygon[0][1]);
+      this.ctx.moveTo(
+        this.transformedPolygon[0][0],
+        this.transformedPolygon[0][1]
+      );
 
       // Draw sequential lines to all points of the polygon
-      for(let i = 0; i < this.transformedPolygon.length; i++) {
-        this.ctx.lineTo(this.transformedPolygon[i][0], this.transformedPolygon[i][1]);
+      for (let i = 0; i < this.transformedPolygon.length; i++) {
+        this.ctx.lineTo(
+          this.transformedPolygon[i][0],
+          this.transformedPolygon[i][1]
+        );
       }
 
-      // Draw line back to first point to close the polygon
-      // this.ctx.lineTo(this.transformedPolygon[0][0], this.transformedPolygon[0][1]);
+      if (this.type === "Bounds") {
+        this.ctx.strokeStyle = this.settings.Colors.BoundsBorderColor;
+        this.ctx.lineWidth = this.settings.BoundsBorderThickness;
+        this.ctx.fillStyle = this.settings.Colors.BoundsFillColor;
 
-      switch(this.type) {
-        case 'Bounds':
-          this.ctx.strokeStyle = this.settings.Colors.BoundsBorderColor;
-          this.ctx.lineWidth = this.settings.BoundsBorderThickness;
-          this.ctx.fillStyle = this.settings.Colors.BoundsFillColor;
-
-          this.ctx.stroke();
-          this.ctx.lineWidth = 1;
-
-          break;
-
-        case 'Obstacle':
-          this.ctx.fillStyle = this.settings.Colors.ObstacleFillColor;
-          break;
+        this.ctx.stroke();
+        this.ctx.lineWidth = 1;
+      } else if (this.type === "Obstacle") {
+        this.ctx.fillStyle = this.settings.Colors.ObstacleFillColor;
       }
 
       this.ctx.fill();
-
-      // Draw bounding box
-      // this.ctx.beginPath();
-      // this.ctx.moveTo(this.origin.x, this.origin.y);
-      // this.ctx.lineTo(this.origin.x + this.width, this.origin.y);
-      // this.ctx.lineTo(this.origin.x + this.width, this.origin.y + this.height);
-      // this.ctx.lineTo(this.origin.x, this.origin.y + this.height);
-      // this.ctx.lineTo(this.origin.x, this.origin.y);
-      // this.ctx.strokeStyle = 'rgba(255,255,255,1)';
-      // this.ctx.stroke();
     }
   }
 }
