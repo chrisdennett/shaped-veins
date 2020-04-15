@@ -6,16 +6,8 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 import InfoIcon from "@material-ui/icons/InfoRounded";
 import MenuIcon from "@material-ui/icons/Menu";
 import CloseIcon from "@material-ui/icons/Close";
-// import Radio from "@material-ui/core/Radio";
-// import RadioGroup from "@material-ui/core/RadioGroup";
-// import FormControlLabel from "@material-ui/core/FormControlLabel";
-// import FormControl from "@material-ui/core/FormControl";
-// import FormLabel from "@material-ui/core/FormLabel";
-// import { styled as mStyled } from "@material-ui/core/styles";
-// import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
-import Icon from "@material-ui/core/Icon";
 import DeleteIcon from "@material-ui/icons/Delete";
 // comps
 import { Info } from "../info/Info";
@@ -26,6 +18,7 @@ export const Controls = ({
   toggleEditing,
   save_as_svg,
   isEditing,
+  reRun,
   isDrawingOuterShape,
 }) => {
   const [showControls, setShowControls] = useState(true);
@@ -35,8 +28,9 @@ export const Controls = ({
   useHotkeys("i", () => setShowInfo((prev) => !prev));
   useHotkeys("h", () => setShowControls((prev) => !prev));
   useHotkeys("e", () => onDoneClick());
+  useHotkeys("r", () => reRun());
   useHotkeys("z", () => removeLastNode());
-  useHotkeys("x", () => drawOuterShape(!isDrawingOuterShape));
+  useHotkeys("x", () => drawOuterShape(true));
   useHotkeys("s", () => save_as_svg());
 
   const onShowCheatSheet = () => setShowInfo(true);
@@ -45,8 +39,10 @@ export const Controls = ({
   const onDoneClick = () => {
     if (isEditing) {
       toggleEditing();
+    } else if (isDrawingOuterShape) {
+      drawOuterShape(false);
     } else {
-      drawOuterShape(!isDrawingOuterShape);
+      toggleEditing();
     }
   };
 
@@ -106,6 +102,12 @@ export const Controls = ({
             </Control>
 
             <Control>
+              <Button size="small" variant="contained" onClick={reRun}>
+                Rerun 'r'
+              </Button>
+            </Control>
+
+            <Control>
               <Button
                 size="small"
                 color={"secondary"}
@@ -113,7 +115,7 @@ export const Controls = ({
                 onClick={drawOuterShape}
                 startIcon={<DeleteIcon />}
               >
-                Clear Outer 'x'
+                Remake Outer 'x'
               </Button>
             </Control>
 

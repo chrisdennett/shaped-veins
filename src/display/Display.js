@@ -12,7 +12,7 @@ import Settings from "../core/Settings";
 
 let network;
 
-const Display = ({ width, height, bounds, isPaused }) => {
+const Display = ({ width, height, bounds, startPoints, reRunId }) => {
   useAnimationFrame(() => {
     network.update();
     network.draw();
@@ -35,15 +35,17 @@ const Display = ({ width, height, bounds, isPaused }) => {
   React.useEffect(() => {
     resetNetwork();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bounds]);
+  }, [bounds, startPoints, reRunId]);
 
   const resetNetwork = () => {
     const ctx = canvasRef.current.getContext("2d");
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
     network.reset();
     network.bounds = getBounds({ ctx, bounds, width, height });
     network.obstacles = getObstacles(ctx);
     network.attractors = getAttractors(ctx);
-    addStartNode(ctx);
+    addStartNodes(ctx, startPoints);
   };
 
   return (
@@ -76,10 +78,12 @@ const CanvasStyled = styled.canvas`
   max-height: 100%;
 `;
 
-const addStartNode = (ctx) => {
-  network.addNode(
-    new Node(null, new Vec2(150, 870), true, ctx, Settings, undefined)
-  );
+const addStartNodes = (ctx, startPoints = [[150, 870]]) => {
+  for (let pt of startPoints) {
+    network.addNode(
+      new Node(null, new Vec2(pt[0], pt[1]), true, ctx, Settings, undefined)
+    );
+  }
 };
 
 const getObstacles = (ctx) => {

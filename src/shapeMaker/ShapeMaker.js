@@ -6,8 +6,9 @@ const ShapeMaker = ({
   width,
   height,
   bounds = [],
+  startPoints = [],
   updateBounds,
-  isEditing,
+  updateStartPoints,
   isDrawingOuterShape,
 }) => {
   const [indexToEdit, setIndexToEdit] = useState(null);
@@ -15,13 +16,14 @@ const ShapeMaker = ({
   useEffect(() => {
     if (indexToEdit === null) return;
 
-    const setFromEvent = (e) =>
+    const setFromEvent = (e) => {
       updateMarkerPosition(indexToEdit, e.clientX, e.clientY);
-
+    };
     window.addEventListener("mousemove", setFromEvent);
     return () => {
       window.removeEventListener("mousemove", setFromEvent);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [indexToEdit]);
 
   const addNode = (x, y) => {
@@ -30,10 +32,16 @@ const ShapeMaker = ({
     updateBounds([...bounds, node]);
   };
 
-  const updateMarkerPosition = (index, x, y) => {
-    const newArr = [...bounds];
-    newArr[index] = [x, y];
-    updateBounds(newArr);
+  const updateMarkerPosition = (indexToEdit, x, y) => {
+    if (indexToEdit.isBoundsPt) {
+      const newArr = [...bounds];
+      newArr[indexToEdit.index] = [x, y];
+      updateBounds(newArr);
+    } else if (indexToEdit.isStartPt) {
+      const newArr = [...startPoints];
+      newArr[indexToEdit.index] = [x, y];
+      updateStartPoints(newArr);
+    }
   };
 
   return (
@@ -54,22 +62,52 @@ const ShapeMaker = ({
           let nodeColour = "blue";
           if (isFirstNode) nodeColour = "green";
           if (isLastNode) nodeColour = "red";
+          const lastNode = bounds[bounds.length - 1];
 
           return (
             <g key={index}>
-              <line
-                x1={node[0]}
-                y1={node[1]}
-                x2={nextNode[0]}
-                y2={nextNode[1]}
-                stroke={"red"}
-              />
+              {isFirstNode && (
+                <line
+                  x1={lastNode[0]}
+                  y1={lastNode[1]}
+                  x2={node[0]}
+                  y2={node[1]}
+                  stroke={"red"}
+                />
+              )}
+
+              {!isLastNode && (
+                <line
+                  x1={node[0]}
+                  y1={node[1]}
+                  x2={nextNode[0]}
+                  y2={nextNode[1]}
+                  stroke={"red"}
+                />
+              )}
               <StyledCircle
-                onMouseDown={() => setIndexToEdit(index)}
+                onMouseDown={() => setIndexToEdit({ index, isBoundsPt: true })}
                 stroke={nodeColour}
                 cx={node[0]}
                 cy={node[1]}
                 fill={nodeColour}
+                r={10}
+              />
+            </g>
+          );
+        })}
+      </g>
+
+      <g>
+        {startPoints.map((node, index) => {
+          return (
+            <g key={"startPt" + index}>
+              <StyledCircle
+                onMouseDown={() => setIndexToEdit({ index, isStartPt: true })}
+                stroke={"yellow"}
+                cx={node[0]}
+                cy={node[1]}
+                fill={"yellow"}
                 r={10}
               />
             </g>

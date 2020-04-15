@@ -8,15 +8,21 @@ import Display from "./display/Display";
 import ShapeMaker from "./shapeMaker/ShapeMaker";
 
 export default function App() {
+  const [reRunId, setReRunId] = useState(0);
   const [isDrawingOuterShape, setIsDrawingOuterShape] = useState(false);
   const [isEditing, setIsEditing] = useState(true);
   const [bounds, setBounds] = useLocalStorage("bounds", []);
+  const [startPoints, setStartPoints] = useLocalStorage("startPoints", []);
 
   const width = window.innerWidth;
   const height = window.innerHeight;
 
   const updateBounds = (newBounds) => {
     setBounds(newBounds);
+  };
+
+  const updateStartPoints = (newStartPoints) => {
+    setStartPoints(newStartPoints);
   };
 
   const removeLastNode = () => {
@@ -32,6 +38,8 @@ export default function App() {
     }
   };
 
+  const reRun = () => setReRunId((prev) => setReRunId(prev + 1));
+
   const toggleEditing = () => setIsEditing((prev) => !prev);
 
   const controlsProps = {
@@ -41,6 +49,7 @@ export default function App() {
     drawOuterShape,
     toggleEditing,
     save_as_svg,
+    reRun,
   };
 
   const showShapeMaker = isEditing || isDrawingOuterShape;
@@ -56,9 +65,17 @@ export default function App() {
           isDrawingOuterShape={isDrawingOuterShape}
           isEditing={isEditing}
           updateBounds={updateBounds}
+          updateStartPoints={updateStartPoints}
+          startPoints={startPoints}
         />
       )}
-      <Display width={width} height={height} bounds={bounds} />
+      <Display
+        width={width}
+        height={height}
+        bounds={bounds}
+        startPoints={startPoints}
+        reRunId={reRunId}
+      />
     </Container>
   );
 }
