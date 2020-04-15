@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Button from "@material-ui/core/Button";
+import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 
 export const Info = ({ onClick }) => {
   return (
@@ -9,34 +10,26 @@ export const Info = ({ onClick }) => {
         <h1>Info</h1>
 
         <Button
-          color="secondary"
-          variant="outlined"
+          endIcon={<OpenInNewIcon />}
+          color="default"
+          variant="contained"
           href={"https://artfly.io/projector-shape-mapping-thing/"}
           target={"_blank"}
           rel="noreferrer"
           style={{ marginBottom: 10, width: "100%" }}
         >
-          Bit about what this is...
+          What & why is this thing?
         </Button>
 
         <Shortcuts>
           <div>
-            <span>"i"</span>: toggle this info thing
-          </div>
-          <div>
-            <span>"h"</span>: toggle controls
-          </div>
-          <div>
             <span>"e"</span>: toggle editing
           </div>
           <div>
-            <span>"z"</span>: remove last point
+            <span>"r"</span>: re-run
           </div>
           <div>
-            <span>"x"</span>: remove last pyramid
-          </div>
-          <div>
-            <span>"n, a, b, c, d"</span>: diff animations
+            <span>"i"</span>: toggle this info thing
           </div>
         </Shortcuts>
       </Sheet>

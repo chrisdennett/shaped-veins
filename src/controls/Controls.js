@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-// import useHotkeys from "@reecelucas/react-use-hotkeys";
+import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 // ui
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
@@ -34,10 +34,9 @@ export const Controls = ({
 }) => {
   const [showInfo, setShowInfo] = useLocalStorage("showInfo", true);
 
-  // useHotkeys("i", () => setShowInfo((prev) => !prev));
-  // useHotkeys("e", () => onDoneClick());
-  // useHotkeys("r", () => reRun());
-  // useHotkeys("z", () => removeLastNode());
+  useHotkeys("i", () => setShowInfo((prev) => !prev));
+  useHotkeys("e", () => (isEditing ? onDoneClick() : setIsEditing(true)));
+  useHotkeys("r", () => reRun());
   // useHotkeys("x", () => drawOuterShape(true));
   // useHotkeys("s", () => save_as_svg());
 
