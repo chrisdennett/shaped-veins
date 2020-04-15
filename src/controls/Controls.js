@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import useHotkeys from "@reecelucas/react-use-hotkeys";
+// import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 // ui
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
@@ -50,6 +50,25 @@ export const Controls = ({
   };
 
   const showAddBoundsButt = !hasBounds || isAddingBounds;
+  const showObstaclesButt = !hasObstacles || isAddingObstacles;
+
+  const setIsAddingOption = (option, isAdding) => {
+    if (option === "bounds") {
+      setIsAddingBounds(isAdding);
+      setIsAddingObstacles(false);
+      setIsAddingStartPoints(false);
+    }
+    if (option === "starts") {
+      setIsAddingBounds(false);
+      setIsAddingObstacles(false);
+      setIsAddingStartPoints(isAdding);
+    }
+    if (option === "obstacles") {
+      setIsAddingBounds(false);
+      setIsAddingObstacles(isAdding);
+      setIsAddingStartPoints(false);
+    }
+  };
 
   return (
     <>
@@ -72,18 +91,16 @@ export const Controls = ({
         {isEditing && (
           <>
             <StyledButtonSet>
-              <IconButton
-                onClick={onDoneClick}
-                aria-label="done"
-                style={{ background: "green", color: "white" }}
-              >
+              <IconButton onClick={onDoneClick} aria-label="done">
                 <DoneIcon />
               </IconButton>
             </StyledButtonSet>
 
             <StyledButtonSet showDividerAbove>
               <IconButton
-                onClick={() => setIsAddingStartPoints(!isAddingStartPoints)}
+                onClick={() =>
+                  setIsAddingOption("starts", !isAddingStartPoints)
+                }
                 aria-label="done"
                 style={{ background: "yellow", color: "black" }}
               >
@@ -92,7 +109,7 @@ export const Controls = ({
 
               {showAddBoundsButt && (
                 <IconButton
-                  onClick={() => setIsAddingBounds(!isAddingBounds)}
+                  onClick={() => setIsAddingOption("bounds", !isAddingBounds)}
                   aria-label="done"
                   style={{ background: "blue", color: "white" }}
                 >
@@ -100,13 +117,15 @@ export const Controls = ({
                 </IconButton>
               )}
 
-              {!hasObstacles && (
+              {showObstaclesButt && (
                 <IconButton
-                  onClick={() => setIsAddingObstacles(true)}
+                  onClick={() =>
+                    setIsAddingOption("obstacles", !isAddingObstacles)
+                  }
                   aria-label="done"
                   style={{ background: "red", color: "white" }}
                 >
-                  <AddIcon />
+                  {isAddingObstacles ? <DoneIcon /> : <AddIcon />}
                 </IconButton>
               )}
             </StyledButtonSet>
@@ -169,47 +188,5 @@ const StyledButtonSet = styled.div`
   margin-top: ${(props) => (props.showDividerAbove ? "20px" : "none")};
   button {
     margin: 5px 0;
-  }
-`;
-
-const Control = styled.div`
-  margin-bottom: 15px;
-
-  button {
-    width: 100%;
-  }
-`;
-
-const DoneButtonStyle = styled.div`
-  position: absolute;
-  z-index: 2;
-`;
-
-const ControlsStyle = styled.div`
-  position: absolute;
-  z-index: 1;
-  border-radius: 0px 0 10px 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  color: white;
-  padding: ${(props) => (props.isOpen ? "0 10px" : "0 0")};
-  width: ${(props) => (props.showControls ? "210px" : "30px")};
-  background: rgba(0, 0, 0, 0.8);
-
-  fieldset {
-    border-color: white;
-    legend {
-      color: #aaa !important;
-    }
-  }
-
-  .MuiTextField-root {
-    label {
-      color: #aaa;
-    }
-    input {
-      color: white;
-    }
   }
 `;

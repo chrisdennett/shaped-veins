@@ -7,7 +7,7 @@ import { getGridOfAttractors } from "../core/AttractorPatterns";
 import Node from "../core/Node";
 import Path from "../core/Path";
 // import { setupKeyListeners } from "../core/KeyboardInteractions";
-import { getCircleOfPoints } from "../core/Utilities";
+// import { getCircleOfPoints } from "../core/Utilities";
 import Settings from "../core/Settings";
 
 let network;
@@ -42,7 +42,7 @@ const Display = ({
   React.useEffect(() => {
     resetNetwork();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bounds, startPoints, reRunId]);
+  }, [bounds, startPoints, obstacles, reRunId]);
 
   const resetNetwork = () => {
     const ctx = canvasRef.current.getContext("2d");
@@ -92,7 +92,7 @@ const getObstacles = (ctx, obstacles) => {
     obstacleArr.push(new Path(obstacles, "Obstacle", ctx));
   }
 
-  return [];
+  return obstacleArr;
 };
 
 const getBounds = ({ ctx, bounds, width, height }) => {

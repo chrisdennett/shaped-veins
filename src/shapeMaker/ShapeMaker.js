@@ -7,10 +7,13 @@ const ShapeMaker = ({
   height,
   bounds = [],
   startPoints = [],
+  obstacles = [],
   setBounds,
   setStartPoints,
+  setObstacles,
   isAddingBounds,
   isAddingStartPoints,
+  isAddingObstacles,
 }) => {
   const [indexToEdit, setIndexToEdit] = useState(null);
 
@@ -33,6 +36,8 @@ const ShapeMaker = ({
       setBounds([...bounds, node]);
     } else if (isAddingStartPoints) {
       setStartPoints([...startPoints, node]);
+    } else if (isAddingObstacles) {
+      setObstacles([...obstacles, node]);
     }
   };
 
@@ -45,10 +50,15 @@ const ShapeMaker = ({
       const newArr = [...startPoints];
       newArr[indexToEdit.index] = [x, y];
       setStartPoints(newArr);
+    } else if (indexToEdit.isObstaclePt) {
+      const newArr = [...obstacles];
+      newArr[indexToEdit.index] = [x, y];
+      setObstacles(newArr);
     }
   };
 
-  const isAddingNodes = isAddingBounds || isAddingStartPoints;
+  const isAddingNodes =
+    isAddingBounds || isAddingStartPoints || isAddingObstacles;
 
   return (
     <SVG
@@ -91,6 +101,50 @@ const ShapeMaker = ({
               )}
               <StyledCircle
                 onMouseDown={() => setIndexToEdit({ index, isBoundsPt: true })}
+                stroke={nodeColour}
+                cx={node[0]}
+                cy={node[1]}
+                fill={nodeColour}
+                r={10}
+              />
+            </g>
+          );
+        })}
+      </g>
+
+      <g>
+        {obstacles.map((node, index) => {
+          const isLastNode = index === obstacles.length - 1;
+          const isFirstNode = index === 0;
+          const nextNode = obstacles[isLastNode ? 0 : index + 1];
+          const nodeColour = "red";
+          const lastNode = obstacles[obstacles.length - 1];
+
+          return (
+            <g key={index}>
+              {isFirstNode && (
+                <line
+                  x1={lastNode[0]}
+                  y1={lastNode[1]}
+                  x2={node[0]}
+                  y2={node[1]}
+                  stroke={"red"}
+                />
+              )}
+
+              {!isLastNode && (
+                <line
+                  x1={node[0]}
+                  y1={node[1]}
+                  x2={nextNode[0]}
+                  y2={nextNode[1]}
+                  stroke={"red"}
+                />
+              )}
+              <StyledCircle
+                onMouseDown={() =>
+                  setIndexToEdit({ index, isObstaclePt: true })
+                }
                 stroke={nodeColour}
                 cx={node[0]}
                 cy={node[1]}

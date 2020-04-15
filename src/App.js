@@ -95,11 +95,14 @@ export default function App() {
           width={width}
           height={height}
           bounds={bounds}
+          obstacles={obstacles}
           isAddingStartPoints={isAddingStartPoints}
           isAddingBounds={isAddingBounds}
+          isAddingObstacles={isAddingObstacles}
           isEditing={isEditing}
           setBounds={setBounds}
           setStartPoints={setStartPoints}
+          setObstacles={setObstacles}
           startPoints={startPoints}
         />
       )}
