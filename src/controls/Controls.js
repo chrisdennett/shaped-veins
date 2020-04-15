@@ -49,6 +49,8 @@ export const Controls = ({
     setIsEditing(false);
   };
 
+  const showAddBoundsButt = !hasBounds || isAddingBounds;
+
   return (
     <>
       {showInfo && <Info onClick={() => setShowInfo(false)} />}
@@ -87,13 +89,14 @@ export const Controls = ({
               >
                 {isAddingStartPoints ? <DoneIcon /> : <AddIcon />}
               </IconButton>
-              {!hasBounds && (
+
+              {showAddBoundsButt && (
                 <IconButton
-                  onClick={() => setIsAddingBounds(true)}
+                  onClick={() => setIsAddingBounds(!isAddingBounds)}
                   aria-label="done"
                   style={{ background: "blue", color: "white" }}
                 >
-                  <AddIcon />
+                  {isAddingBounds ? <DoneIcon /> : <AddIcon />}
                 </IconButton>
               )}
 
