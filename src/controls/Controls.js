@@ -15,14 +15,14 @@ import IconButton from "@material-ui/core/IconButton";
 import { Info } from "../info/Info";
 
 export const Controls = ({
+  hasBounds,
+  hasObstacles,
   setBounds,
   setStartPoints,
-  setObstaclePoints,
+  setObstacles,
   setIsEditing,
-  drawOuterShape,
   removeLastNode,
   toggleEditing,
-  save_as_svg,
   isEditing,
   isAddingBounds,
   isAddingStartPoints,
@@ -33,7 +33,6 @@ export const Controls = ({
   setIsAddingObstacles,
 }) => {
   const [showInfo, setShowInfo] = useLocalStorage("showInfo", true);
-  // const isInEditMode = isEditing || isDrawingOuterShape;
 
   // useHotkeys("i", () => setShowInfo((prev) => !prev));
   // useHotkeys("e", () => onDoneClick());
@@ -43,26 +42,12 @@ export const Controls = ({
   // useHotkeys("s", () => save_as_svg());
 
   const onDoneClick = () => {
-    if (isAddingBounds) setIsAddingBounds(false);
-    else if (isAddingObstacles) setIsAddingObstacles(false);
-    else if (isAddingStartPoints) setIsAddingStartPoints(false);
-    else {
-      setIsEditing(false);
-    }
+    setIsAddingBounds(false);
+    setIsAddingObstacles(false);
+    setIsAddingStartPoints(false);
+
+    setIsEditing(false);
   };
-
-  // if (isInEditMode) {
-  //   return (
-  //     <DoneButtonStyle>
-  //       <Button size="small" variant="contained" onClick={removeLastNode}>
-  //         Remove Last Point 'z'
-  //       </Button>
-  //     </DoneButtonStyle>
-  //   );
-  // }
-
-  const isAddingNodes =
-    isAddingBounds || isAddingStartPoints || isAddingObstacles;
 
   return (
     <>
@@ -94,15 +79,15 @@ export const Controls = ({
               </IconButton>
             </StyledButtonSet>
 
-            {!isAddingNodes && (
-              <StyledButtonSet showDividerAbove>
-                <IconButton
-                  onClick={() => setIsAddingStartPoints(true)}
-                  aria-label="done"
-                  style={{ background: "yellow", color: "black" }}
-                >
-                  <AddIcon />
-                </IconButton>
+            <StyledButtonSet showDividerAbove>
+              <IconButton
+                onClick={() => setIsAddingStartPoints(true)}
+                aria-label="done"
+                style={{ background: "yellow", color: "black" }}
+              >
+                <AddIcon />
+              </IconButton>
+              {!hasBounds && (
                 <IconButton
                   onClick={() => setIsAddingBounds(true)}
                   aria-label="done"
@@ -110,6 +95,9 @@ export const Controls = ({
                 >
                   <AddIcon />
                 </IconButton>
+              )}
+
+              {!hasObstacles && (
                 <IconButton
                   onClick={() => setIsAddingObstacles(true)}
                   aria-label="done"
@@ -117,17 +105,20 @@ export const Controls = ({
                 >
                   <AddIcon />
                 </IconButton>
-              </StyledButtonSet>
-            )}
+              )}
+            </StyledButtonSet>
+
             {/* DELETE BUTTS */}
             <StyledButtonSet showDividerAbove>
-              <IconButton
-                onClick={() => setBounds([])}
-                aria-label="done"
-                style={{ background: "blue", color: "white" }}
-              >
-                <DeleteForeverIcon />
-              </IconButton>
+              {hasBounds && (
+                <IconButton
+                  onClick={() => setBounds([])}
+                  aria-label="done"
+                  style={{ background: "blue", color: "white" }}
+                >
+                  <DeleteForeverIcon />
+                </IconButton>
+              )}
               <IconButton
                 onClick={() => setStartPoints([])}
                 aria-label="done"
@@ -135,13 +126,15 @@ export const Controls = ({
               >
                 <DeleteForeverIcon />
               </IconButton>
-              <IconButton
-                onClick={() => setObstaclePoints([])}
-                aria-label="done"
-                style={{ background: "red", color: "white" }}
-              >
-                <DeleteForeverIcon />
-              </IconButton>
+              {hasObstacles && (
+                <IconButton
+                  onClick={() => setObstacles([])}
+                  aria-label="done"
+                  style={{ background: "red", color: "white" }}
+                >
+                  <DeleteForeverIcon />
+                </IconButton>
+              )}
             </StyledButtonSet>
           </>
         )}

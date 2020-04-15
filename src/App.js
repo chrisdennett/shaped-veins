@@ -14,10 +14,7 @@ export default function App() {
   const [isAddingBounds, setIsAddingBounds] = useState(false);
   const [startPoints, setStartPoints] = useLocalStorage("startPoints", null);
   const [isAddingStartPoints, setIsAddingStartPoints] = useState(false);
-  const [obstaclePoints, setObstaclePoints] = useLocalStorage(
-    "obstacles",
-    null
-  );
+  const [obstacles, setObstacles] = useLocalStorage("obstacles", []);
   const [isAddingObstacles, setIsAddingObstacles] = useState(false);
 
   const width = window.innerWidth;
@@ -36,13 +33,13 @@ export default function App() {
     ]);
   }
 
-  const updateBounds = (newBounds) => {
-    setBounds(newBounds);
-  };
+  // const updateBounds = (newBounds) => {
+  //   setBounds(newBounds);
+  // };
 
-  const updateStartPoints = (newStartPoints) => {
-    setStartPoints(newStartPoints);
-  };
+  // const updateStartPoints = (newStartPoints) => {
+  //   setStartPoints(newStartPoints);
+  // };
 
   const removeLastNode = () => {
     setBounds((prev) => [...prev].slice(0, prev.length - 1));
@@ -67,9 +64,11 @@ export default function App() {
   const toggleEditing = () => setIsEditing((prev) => !prev);
 
   const controlsProps = {
+    hasBounds: bounds && bounds.length > 0,
+    hasObstacles: obstacles && obstacles.length > 0,
     setBounds,
     setStartPoints,
-    setObstaclePoints,
+    setObstacles,
     setIsAddingBounds,
     setIsAddingStartPoints,
     setIsAddingObstacles,
@@ -96,10 +95,11 @@ export default function App() {
           width={width}
           height={height}
           bounds={bounds}
+          isAddingStartPoints={isAddingStartPoints}
           isAddingBounds={isAddingBounds}
           isEditing={isEditing}
-          updateBounds={updateBounds}
-          updateStartPoints={updateStartPoints}
+          setBounds={setBounds}
+          setStartPoints={setStartPoints}
           startPoints={startPoints}
         />
       )}
@@ -108,6 +108,7 @@ export default function App() {
         height={height}
         bounds={bounds}
         startPoints={startPoints}
+        obstacles={obstacles}
         reRunId={reRunId}
       />
     </Container>

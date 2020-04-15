@@ -12,7 +12,14 @@ import Settings from "../core/Settings";
 
 let network;
 
-const Display = ({ width, height, bounds, startPoints, reRunId }) => {
+const Display = ({
+  width,
+  height,
+  bounds,
+  obstacles,
+  startPoints,
+  reRunId,
+}) => {
   useAnimationFrame(() => {
     network.update();
     network.draw();
@@ -43,7 +50,7 @@ const Display = ({ width, height, bounds, startPoints, reRunId }) => {
     ctx.lineCap = "round";
     network.reset();
     network.bounds = getBounds({ ctx, bounds, width, height });
-    network.obstacles = getObstacles(ctx);
+    network.obstacles = getObstacles(ctx, obstacles);
     network.attractors = getAttractors(ctx);
     addStartNodes(ctx, startPoints);
   };
@@ -78,11 +85,14 @@ const addStartNodes = (ctx, startPoints) => {
   }
 };
 
-const getObstacles = (ctx) => {
-  const obstacleArr = [
-    new Path(getCircleOfPoints(451, 450, 100, 100), "Obstacle", ctx),
-  ];
-  return obstacleArr;
+const getObstacles = (ctx, obstacles) => {
+  let obstacleArr = [];
+
+  if (obstacles && obstacles.length > 0) {
+    obstacleArr.push(new Path(obstacles, "Obstacle", ctx));
+  }
+
+  return [];
 };
 
 const getBounds = ({ ctx, bounds, width, height }) => {

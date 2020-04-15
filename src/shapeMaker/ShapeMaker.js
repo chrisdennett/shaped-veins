@@ -7,8 +7,8 @@ const ShapeMaker = ({
   height,
   bounds = [],
   startPoints = [],
-  updateBounds,
-  updateStartPoints,
+  setBounds,
+  setStartPoints,
   isAddingBounds,
   isAddingStartPoints,
 }) => {
@@ -28,22 +28,27 @@ const ShapeMaker = ({
   }, [indexToEdit]);
 
   const addNode = (x, y) => {
-    if (!isAddingBounds) return;
     const node = [x, y];
-    updateBounds([...bounds, node]);
+    if (isAddingBounds) {
+      setBounds([...bounds, node]);
+    } else if (isAddingStartPoints) {
+      setStartPoints([...startPoints, node]);
+    }
   };
 
   const updateMarkerPosition = (indexToEdit, x, y) => {
     if (indexToEdit.isBoundsPt) {
       const newArr = [...bounds];
       newArr[indexToEdit.index] = [x, y];
-      updateBounds(newArr);
+      setBounds(newArr);
     } else if (indexToEdit.isStartPt) {
       const newArr = [...startPoints];
       newArr[indexToEdit.index] = [x, y];
-      updateStartPoints(newArr);
+      setStartPoints(newArr);
     }
   };
+
+  const isAddingNodes = isAddingBounds || isAddingStartPoints;
 
   return (
     <SVG
@@ -113,7 +118,7 @@ const ShapeMaker = ({
           );
         })}
       </g>
-      {isAddingBounds && <EditCrossHairs width={width} height={height} />}
+      {isAddingNodes && <EditCrossHairs width={width} height={height} />}
     </SVG>
   );
 };
