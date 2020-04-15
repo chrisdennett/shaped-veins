@@ -62,21 +62,14 @@ export default Display;
 // STYLES
 const Container = styled.div`
   background: #fff;
-  border-radius: 10px;
   background-image: url(./img/cutting-mat-tile.png);
 `;
 
 const CanvasHolder = styled.div`
   padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
-const CanvasStyled = styled.canvas`
-  max-width: 100%;
-  max-height: 100%;
-`;
+const CanvasStyled = styled.canvas``;
 
 const addStartNodes = (ctx, startPoints = [[150, 870]]) => {
   for (let pt of startPoints) {
