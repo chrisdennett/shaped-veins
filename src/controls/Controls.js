@@ -17,11 +17,11 @@ import { Info } from "../info/Info";
 export const Controls = ({
   hasBounds,
   hasObstacles,
+  hasStartingPoints,
   setBounds,
   setStartPoints,
   setObstacles,
   setIsEditing,
-  removeLastNode,
   toggleEditing,
   isEditing,
   isAddingBounds,
@@ -141,13 +141,17 @@ export const Controls = ({
                   <DeleteForeverIcon />
                 </IconButton>
               )}
-              <IconButton
-                onClick={() => setStartPoints([])}
-                aria-label="done"
-                style={{ background: "yellow", color: "black" }}
-              >
-                <DeleteForeverIcon />
-              </IconButton>
+
+              {hasStartingPoints && (
+                <IconButton
+                  onClick={() => setStartPoints([])}
+                  aria-label="done"
+                  style={{ background: "yellow", color: "black" }}
+                >
+                  <DeleteForeverIcon />
+                </IconButton>
+              )}
+
               {hasObstacles && (
                 <IconButton
                   onClick={() => setObstacles([])}

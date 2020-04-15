@@ -66,6 +66,7 @@ export default function App() {
   const controlsProps = {
     hasBounds: bounds && bounds.length > 0,
     hasObstacles: obstacles && obstacles.length > 0,
+    hasStartingPoints: startPoints && startPoints.length > 0,
     setBounds,
     setStartPoints,
     setObstacles,

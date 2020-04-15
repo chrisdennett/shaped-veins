@@ -60,6 +60,10 @@ const ShapeMaker = ({
   const isAddingNodes =
     isAddingBounds || isAddingStartPoints || isAddingObstacles;
 
+  let crosshairColour = "red";
+  if (isAddingStartPoints) crosshairColour = "yellow";
+  if (isAddingBounds) crosshairColour = "blue";
+
   return (
     <SVG
       width={width > 0 ? width : 1}
@@ -172,7 +176,13 @@ const ShapeMaker = ({
           );
         })}
       </g>
-      {isAddingNodes && <EditCrossHairs width={width} height={height} />}
+      {isAddingNodes && (
+        <EditCrossHairs
+          width={width}
+          height={height}
+          crosshairColour={crosshairColour}
+        />
+      )}
     </SVG>
   );
 };
