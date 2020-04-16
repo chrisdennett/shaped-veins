@@ -4,9 +4,10 @@ import * as Vec2 from "vec2";
 import { random } from "./Utilities";
 
 export default class Network {
-  constructor(ctx, settings) {
+  constructor(ctx, settings, sourceImg) {
     this.ctx = ctx;
     this.settings = Object.assign({}, Defaults, settings);
+    this.sourceImg = sourceImg;
 
     this.attractors = []; // attractors influence node growth
     this.nodes = []; // nodes are connected to form branches
@@ -160,60 +161,22 @@ export default class Network {
 
   draw() {
     this.drawBackground();
-    this.drawBounds();
-    this.drawObstacles();
-    this.drawattractors();
+    // this.ctx.globalCompositeOperation = "lighter";
     this.drawNodes();
   }
 
   drawBackground() {
     this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
     this.ctx.beginPath();
     this.ctx.fillStyle = this.settings.Colors.BackgroundColor;
     this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-  }
-
-  drawBounds() {
-    if (this.settings.ShowBounds && this.bounds !== undefined) {
-      for (let bound of this.bounds) {
-        bound.draw();
-      }
-    }
-  }
-
-  drawObstacles() {
-    if (this.settings.ShowObstacles && this.obstacles !== undefined) {
-      for (let obstacle of this.obstacles) {
-        obstacle.draw();
-      }
-    }
+    this.ctx.drawImage(this.sourceImg, 0, 0);
   }
 
   drawNodes() {
     if (this.settings.ShowNodes) {
       for (let node of this.nodes) {
         node.draw();
-      }
-    }
-  }
-
-  drawattractors() {
-    for (let attractor of this.attractors) {
-      attractor.draw();
-
-      // Draw lines between each attractor and the nodes they are influencing
-      if (
-        this.settings.ShowInfluenceLines &&
-        attractor.influencingNodes.length > 0
-      ) {
-        for (let node of attractor.influencingNodes) {
-          this.ctx.beginPath();
-          this.ctx.moveTo(attractor.position.x, attractor.position.y);
-          this.ctx.lineTo(node.position.x, node.position.y);
-          this.ctx.strokeStyle = this.settings.Colors.InfluenceLinesColor;
-          this.ctx.stroke();
-        }
       }
     }
   }

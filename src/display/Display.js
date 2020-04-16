@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import { useAnimationFrame } from "../hooks/useAnimationFrame";
 import * as Vec2 from "vec2";
@@ -21,7 +21,10 @@ const Display = ({
   reRunId,
   setCanvasRef,
 }) => {
+  const [sourceImg, setSourceImg] = useState(null);
+
   useAnimationFrame(() => {
+    if (!network) return;
     network.update();
     network.draw();
   });
@@ -29,17 +32,26 @@ const Display = ({
   const canvasRef = useRef(null);
 
   React.useEffect(() => {
-    if (canvasRef) {
+    if (!sourceImg) {
+      const image = new Image();
+      image.crossOrigin = "Anonymous";
+      image.onload = () => {
+        setSourceImg(image);
+      };
+      image.src = "./img/gove_750x1000.jpg";
+    }
+
+    if (canvasRef && sourceImg) {
       setCanvasRef(canvasRef);
       const ctx = canvasRef.current.getContext("2d");
       canvasRef.current.width = width;
       canvasRef.current.height = height;
       // ctx.drawImage(framedCanvas, 0, 0);
-      network = new Network(ctx, Settings);
+      network = new Network(ctx, Settings, sourceImg);
       resetNetwork();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [width, height]);
+  }, [width, height, sourceImg]);
 
   React.useEffect(() => {
     resetNetwork();
@@ -47,6 +59,8 @@ const Display = ({
   }, [bounds, startPoints, obstacles, reRunId]);
 
   const resetNetwork = () => {
+    if (!network) return;
+
     const ctx = canvasRef.current.getContext("2d");
     ctx.lineJoin = "round";
     ctx.lineCap = "round";

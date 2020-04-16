@@ -10,7 +10,7 @@ import ShapeMaker from "./shapeMaker/ShapeMaker";
 export default function App() {
   const [canvasRef, setCanvasRef] = useState(0);
   const [reRunId, setReRunId] = useState(0);
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [bounds, setBounds] = useLocalStorage("bounds", []);
   const [isAddingBounds, setIsAddingBounds] = useState(false);
   const [startPoints, setStartPoints] = useLocalStorage("startPoints", null);
@@ -18,8 +18,8 @@ export default function App() {
   const [obstacles, setObstacles] = useLocalStorage("obstacles", []);
   const [isAddingObstacles, setIsAddingObstacles] = useState(false);
 
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+  const width = 750;
+  const height = 1000;
 
   if (startPoints === null) {
     setStartPoints([[100, 100]]);
