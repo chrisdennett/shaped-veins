@@ -16,6 +16,7 @@ const Display = ({
   width,
   height,
   bounds,
+  isPaused,
   obstacles,
   startPoints,
   reRunId,
@@ -25,7 +26,7 @@ const Display = ({
 
   useAnimationFrame(() => {
     if (!network) return;
-    network.update();
+    network.update(isPaused);
     network.draw();
   });
 
@@ -38,7 +39,9 @@ const Display = ({
       image.onload = () => {
         setSourceImg(image);
       };
-      image.src = "./img/gove_750x1000.jpg";
+      // image.src = "./img/gove_750x1000.jpg";
+      image.src = "./img/mona_537x800.jpg";
+      // image.src = "./img/rainbow-800.jpg";
     }
 
     if (canvasRef && sourceImg) {
@@ -46,8 +49,9 @@ const Display = ({
       const ctx = canvasRef.current.getContext("2d");
       canvasRef.current.width = width;
       canvasRef.current.height = height;
-      // ctx.drawImage(framedCanvas, 0, 0);
-      network = new Network(ctx, Settings, sourceImg);
+
+      network = new Network(ctx, Settings, width, height);
+      network.addImage(sourceImg);
       resetNetwork();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,6 +68,7 @@ const Display = ({
     const ctx = canvasRef.current.getContext("2d");
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
+
     network.reset();
     network.bounds = getBounds({ ctx, bounds, width, height });
     network.obstacles = getObstacles(ctx, obstacles);
@@ -95,9 +100,8 @@ const CanvasStyled = styled.canvas``;
 
 const addStartNodes = (ctx, startPoints) => {
   for (let pt of startPoints) {
-    network.addNode(
-      new Node(null, new Vec2(pt[0], pt[1]), true, ctx, Settings, undefined)
-    );
+    const vPt = new Vec2(pt[0], pt[1]);
+    network.addNode(new Node(null, vPt, true, ctx, Settings, undefined));
   }
 };
 

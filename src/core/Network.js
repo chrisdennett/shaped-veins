@@ -4,11 +4,13 @@ import * as Vec2 from "vec2";
 import { random } from "./Utilities";
 
 export default class Network {
-  constructor(ctx, settings, sourceImg) {
+  constructor(ctx, settings, width, height) {
     this.ctx = ctx;
     this.settings = Object.assign({}, Defaults, settings);
-    this.sourceImg = sourceImg;
-
+    this.sourceImg = null;
+    this.imgData = null;
+    this.width = width;
+    this.height = height;
     this.attractors = []; // attractors influence node growth
     this.nodes = []; // nodes are connected to form branches
 
@@ -20,11 +22,12 @@ export default class Network {
     this.buildSpatialIndices();
   }
 
-  update() {
-    // Skip iteration if paused
-    if (this.settings.IsPaused) {
-      return;
-    }
+  addImage(sourceImg) {
+    this.sourceImg = sourceImg;
+  }
+
+  update(isPaused) {
+    if (isPaused) return;
 
     // Associate attractors with nearby nodes to figure out where growth should occur
     for (let [attractorID, attractor] of this.attractors.entries()) {
@@ -165,18 +168,28 @@ export default class Network {
     this.drawNodes();
   }
 
+  drawImage() {
+    if (this.sourceImg) {
+      this.ctx.drawImage(this.sourceImg, 0, 0);
+
+      if (!this.imgData) {
+        this.imgData = this.ctx.getImageData(0, 0, this.width, this.height);
+      }
+    }
+  }
+
   drawBackground() {
-    this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.drawImage();
     this.ctx.beginPath();
-    this.ctx.fillStyle = this.settings.Colors.BackgroundColor;
-    this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    this.ctx.drawImage(this.sourceImg, 0, 0);
+    this.ctx.fillStyle = "rgba(0, 0, 0, 0.85)"; //this.settings.Colors.BackgroundColor;
+    this.ctx.fillRect(0, 0, this.width, this.height);
   }
 
   drawNodes() {
     if (this.settings.ShowNodes) {
       for (let node of this.nodes) {
-        node.draw();
+        node.draw(this.imgData, this.width);
       }
     }
   }
@@ -393,9 +406,5 @@ export default class Network {
     for (let node of this.nodes) {
       node.settings.EnableOpacityBlending = this.settings.EnableOpacityBlending;
     }
-  }
-
-  togglePause() {
-    this.settings.IsPaused = !this.settings.IsPaused;
   }
 }

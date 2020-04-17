@@ -1,21 +1,27 @@
 import Defaults from "./Defaults";
 
 export default class Node {
-  constructor(parent, position, isTip, ctx, settings, color = undefined) {
+  constructor(
+    parent,
+    position,
+    isTip,
+    ctx,
+    settings,
+    color = undefined,
+    pathColour
+  ) {
     this.parent = parent; // reference to parent node, necessary for vein thickening later
     this.position = position; // {vec2} of this node's position
     this.isTip = isTip; // {boolean}
     this.ctx = ctx; // global canvas context for drawing
     this.settings = Object.assign({}, Defaults, settings);
     this.color = color; // color, usually passed down from parent
+    this.imgData = null;
+    this.width = null;
+    this.pathColour = pathColour;
 
     this.influencedBy = []; // references to all Attractors influencing this node each frame
     this.thickness = 0; // thickness - this is increased during vein thickening process
-  }
-
-  getColorIndicesForCoord(x, y, width) {
-    var red = y * (width * 4) + x * 4;
-    return [red, red + 1, red + 2, red + 3];
   }
 
   RGBToHSL(r, g, b) {
@@ -60,30 +66,56 @@ export default class Node {
     return { h, s, l };
   }
 
-  draw() {
+  getColorIndicesForCoord(x, y, width) {
+    var red = y * (width * 4) + x * 4;
+    return [red, red + 1, red + 2, red + 3];
+  }
+
+  getPathColourFromImage(x, y, width, imageData) {
+    if (!imageData) return;
+
+    var colorIndices = this.getColorIndicesForCoord(x, y, width);
+    var r = imageData.data[colorIndices[0]];
+    var g = imageData.data[colorIndices[1]];
+    var b = imageData.data[colorIndices[2]];
+
+    // let { h: currH, s: currS, l: currL } = this.pathColour;
+    // let { h, s, l } = this.RGBToHSL(r, g, b);
+
+    if (!this.pathColour) {
+      return { r, g, b };
+    }
+
+    const fracOfNew = 0.12;
+    const fracOfOld = 1 - fracOfNew;
+
+    const newR = Math.round(r * fracOfNew + this.pathColour.r * fracOfOld);
+    const newG = Math.round(g * fracOfNew + this.pathColour.g * fracOfOld);
+    const newB = Math.round(b * fracOfNew + this.pathColour.b * fracOfOld);
+
+    return { r: newR, g: newG, b: newB };
+
+    // const newH = Math.round(h * 0.2 + this.pathColour.h * 0.8);
+    // const newS = Math.round(s * 0.2 + this.pathColour.s * 0.8);
+    // const newL = Math.round(l * 0.2 + this.pathColour.l * 0.8);
+
+    // return { h, s, l };
+    // return { h: newH, s: newS, l: newL };
+  }
+
+  draw(imageData, width) {
+    if (!this.imageData) this.imageData = imageData;
+    if (!this.width) this.width = width;
+
     if (this.parent != null) {
       // Smoothly ramp up opacity based on vein thickness
-      if (this.settings.EnableOpacityBlending) {
-        this.ctx.globalAlpha = this.thickness / 3 + 0.2;
-      }
+      // if (this.settings.EnableOpacityBlending) {
+      //   this.ctx.globalAlpha = this.thickness / 3 + 0.2;
+      // }
 
       // "Lines" render mode
       if (this.settings.RenderMode === "Lines") {
         this.ctx.beginPath();
-
-        const imageData = this.ctx.getImageData(
-          this.position.x,
-          this.position.y,
-          1,
-          1
-        );
-
-        var r = imageData.data[0];
-        var g = imageData.data[1];
-        var b = imageData.data[2];
-        // var a = imageData.data[3];
-
-        const { h, s, l } = this.RGBToHSL(r, g, b);
 
         this.ctx.moveTo(this.position.x, this.position.y);
         this.ctx.lineTo(this.parent.position.x, this.parent.position.y);
@@ -101,31 +133,13 @@ export default class Node {
           this.ctx.lineWidth = this.settings.BranchThickness + this.thickness;
         }
 
-        this.ctx.strokeStyle = `hsl(${h - 15}, ${s - 5}%, ${l - 5}%)`;
+        const { x, y } = this.position;
+        const { r, g, b } = this.getPathColourFromImage(x, y, width, imageData);
+
+        // this.ctx.strokeStyle = `hsl(${h}, ${s}%, ${l}%)`;
+        this.ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${1})`;
         this.ctx.stroke();
         this.ctx.lineWidth = 1;
-
-        // "Dots" render mode
-      } else if (this.settings.RenderMode === "Dots") {
-        this.ctx.beginPath();
-        this.ctx.ellipse(
-          this.position.x,
-          this.position.y,
-          1 + this.thickness / 2,
-          1 + this.thickness / 2,
-          0,
-          0,
-          Math.PI * 2
-        );
-
-        // Change color or "tip" nodes
-        if (this.isTip && this.settings.ShowTips) {
-          this.ctx.fillStyle = this.settings.Colors.TipColor;
-        } else {
-          this.ctx.fillStyle = this.settings.Colors.BranchColor;
-        }
-
-        this.ctx.fill();
       }
 
       // Reset global opacity if it was changed due to opacity gradient flag
@@ -143,13 +157,22 @@ export default class Node {
       true
     );
 
+    this.nextPosition.x = Math.round(this.nextPosition.x);
+    this.nextPosition.y = Math.round(this.nextPosition.y);
+
     return new Node(
       this,
       this.nextPosition,
       true,
       this.ctx,
       this.settings,
-      this.color
+      this.color,
+      this.getPathColourFromImage(
+        this.nextPosition.x,
+        this.nextPosition.y,
+        this.width,
+        this.imageData
+      )
     );
   }
 }

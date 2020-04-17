@@ -19,6 +19,8 @@ export const Controls = ({
   hasBounds,
   hasObstacles,
   hasStartingPoints,
+  isPaused,
+  setIsPaused,
   setBounds,
   setStartPoints,
   setObstacles,
@@ -40,6 +42,7 @@ export const Controls = ({
   useHotkeys("e", () => (isEditing ? onDoneClick() : setIsEditing(true)));
   useHotkeys("r", () => reRun());
   useHotkeys("s", () => onSave());
+  useHotkeys("p", () => setIsPaused(!isPaused));
   // useHotkeys("x", () => drawOuterShape(true));
   // useHotkeys("s", () => save_as_svg());
 
