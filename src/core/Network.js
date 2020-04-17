@@ -1,29 +1,26 @@
-import Defaults from "./Defaults";
 import KDBush from "kdbush";
 import * as Vec2 from "vec2";
 import { random } from "./Utilities";
 
 export default class Network {
-  constructor(ctx, settings, width, height) {
+  constructor(ctx, width, height) {
     this.ctx = ctx;
-    this.settings = Object.assign({}, Defaults, settings);
-    this.sourceImg = null;
-    this.imgData = null;
     this.width = width;
     this.height = height;
     this.attractors = []; // attractors influence node growth
     this.nodes = []; // nodes are connected to form branches
 
-    // this.nodesIndex; // kd-bush spatial index for all nodes
+    this.bounds = [];
+    this.obstacles = [];
 
-    this.bounds = []; // array of Path objects that branches cannot grow outside of
-    this.obstacles = []; // array of Path objects that branches must avoid
+    this.backgroundColour = "rgba(0,0,0,1)";
+    this.showNodes = true;
+    this.venationType = "open"; // 'closed'
+    this.enableCanalization = true;
+    this.killDistance = 3;
+    this.attractionDistance = 15;
 
     this.buildSpatialIndices();
-  }
-
-  addImage(sourceImg) {
-    this.sourceImg = sourceImg;
   }
 
   update(isPaused) {
@@ -31,9 +28,9 @@ export default class Network {
 
     // Associate attractors with nearby nodes to figure out where growth should occur
     for (let [attractorID, attractor] of this.attractors.entries()) {
-      switch (this.settings.VenationType) {
+      switch (this.venationType) {
         // For open venation, only associate this attractor with its closest node
-        case "Open":
+        case "open":
           let closestNode = this.getClosestNode(
             attractor,
             this.getNodesInAttractionZone(attractor)
@@ -47,7 +44,7 @@ export default class Network {
           break;
 
         // For closed venation, associate this attractor with all nodes in its relative neighborhood
-        case "Closed":
+        case "closed":
           let neighborhoodNodes = this.getRelativeNeighborNodes(attractor);
           let nodesInKillZone = this.getNodesInKillZone(attractor);
 
@@ -114,7 +111,7 @@ export default class Network {
       node.influencedBy = [];
 
       // Perform auxin flux canalization (line segment thickening)
-      if (node.isTip && this.settings.EnableCanalization) {
+      if (node.isTip && this.enableCanalization) {
         let currentNode = node;
 
         while (currentNode.parent !== null) {
@@ -130,7 +127,7 @@ export default class Network {
 
     // Remove any attractors that have been reached by their associated nodes
     for (let [attractorID, attractor] of this.attractors.entries()) {
-      if (this.settings.VenationType === "Open") {
+      if (this.venationType === "open") {
         // For open venation, remove the attractor as soon as any node reaches it
         if (attractor.reached) {
           this.attractors.splice(attractorID, 1);
@@ -144,8 +141,7 @@ export default class Network {
 
           for (let node of attractor.influencingNodes) {
             if (
-              node.position.distance(attractor.position) >
-              this.settings.KillDistance
+              node.position.distance(attractor.position) > this.killDistance
             ) {
               allNodesReached = false;
             }
@@ -168,28 +164,17 @@ export default class Network {
     this.drawNodes();
   }
 
-  drawImage() {
-    if (this.sourceImg) {
-      this.ctx.drawImage(this.sourceImg, 0, 0);
-
-      if (!this.imgData) {
-        this.imgData = this.ctx.getImageData(0, 0, this.width, this.height);
-      }
-    }
-  }
-
   drawBackground() {
     this.ctx.clearRect(0, 0, this.width, this.height);
-    this.drawImage();
     this.ctx.beginPath();
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.85)"; //this.settings.Colors.BackgroundColor;
+    this.ctx.fillStyle = this.backgroundColour;
     this.ctx.fillRect(0, 0, this.width, this.height);
   }
 
   drawNodes() {
-    if (this.settings.ShowNodes) {
+    if (this.showNodes) {
       for (let node of this.nodes) {
-        node.draw(this.imgData, this.width);
+        node.draw();
       }
     }
   }
@@ -240,29 +225,25 @@ export default class Network {
       .within(
         attractor.position.x,
         attractor.position.y,
-        this.settings.AttractionDistance
+        this.attractionDistance
       )
       .map((id) => this.nodes[id]);
   }
 
   getNodesInKillZone(attractor) {
     return this.nodesIndex
-      .within(
-        attractor.position.x,
-        attractor.position.y,
-        this.settings.KillDistance
-      )
+      .within(attractor.position.x, attractor.position.y, this.killDistance)
       .map((id) => this.nodes[id]);
   }
 
   getClosestNode(attractor, nearbyNodes) {
     let closestNode = null,
-      record = this.settings.AttractionDistance;
+      record = this.attractionDistance;
 
     for (let node of nearbyNodes) {
       let distance = node.position.distance(attractor.position);
 
-      if (distance < this.settings.KillDistance) {
+      if (distance < this.killDistance) {
         attractor.reached = true;
         closestNode = null;
       } else if (distance < record) {
@@ -339,72 +320,5 @@ export default class Network {
       (p) => p.position.x,
       (p) => p.position.y
     );
-  }
-
-  toggleNodes() {
-    this.settings.ShowNodes = !this.settings.ShowNodes;
-  }
-
-  toggleTips() {
-    this.settings.ShowTips = !this.settings.ShowTips;
-
-    for (let node of this.nodes) {
-      node.settings.ShowTips = !node.settings.ShowTips;
-    }
-  }
-
-  toggleattractors() {
-    this.settings.Showattractors = !this.settings.Showattractors;
-
-    for (let attractor of this.attractors) {
-      attractor.settings.Showattractors = !attractor.settings.Showattractors;
-    }
-  }
-
-  toggleAttractionZones() {
-    this.settings.ShowAttractionZones = !this.settings.ShowAttractionZones;
-
-    for (let attractor of this.attractors) {
-      attractor.settings.ShowAttractionZones = !attractor.settings
-        .ShowAttractionZones;
-    }
-  }
-
-  toggleKillZones() {
-    this.settings.ShowKillZones = !this.settings.ShowKillZones;
-
-    for (let attractor of this.attractors) {
-      attractor.settings.ShowKillZones = !attractor.settings.ShowKillZones;
-    }
-  }
-
-  toggleInfluenceLines() {
-    this.settings.ShowInfluenceLines = !this.settings.ShowInfluenceLines;
-  }
-
-  toggleBounds() {
-    this.settings.ShowBounds = !this.settings.ShowBounds;
-  }
-
-  toggleObstacles() {
-    this.settings.ShowObstacles = !this.settings.ShowObstacles;
-  }
-
-  toggleCanalization() {
-    this.settings.EnableCanalization = !this.settings.EnableCanalization;
-
-    if (!this.settings.EnableCanalization) {
-      for (let node of this.nodes) {
-        node.thickness = 0;
-      }
-    }
-  }
-
-  toggleOpacityBlending() {
-    this.settings.EnableOpacityBlending = !this.settings.EnableOpacityBlending;
-
-    for (let node of this.nodes) {
-      node.settings.EnableOpacityBlending = this.settings.EnableOpacityBlending;
-    }
   }
 }

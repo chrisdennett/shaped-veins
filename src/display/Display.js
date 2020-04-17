@@ -8,7 +8,6 @@ import Node from "../core/Node";
 import Path from "../core/Path";
 // import { setupKeyListeners } from "../core/KeyboardInteractions";
 // import { getCircleOfPoints } from "../core/Utilities";
-import Settings from "../core/Settings";
 
 let network;
 
@@ -23,6 +22,7 @@ const Display = ({
   setCanvasRef,
 }) => {
   const [sourceImg, setSourceImg] = useState(null);
+  const [imgData, setImgData] = useState(null);
 
   useAnimationFrame(() => {
     if (!network) return;
@@ -38,24 +38,24 @@ const Display = ({
       image.crossOrigin = "Anonymous";
       image.onload = () => {
         setSourceImg(image);
+        setImgData(getImgData(image));
       };
       // image.src = "./img/gove_750x1000.jpg";
       image.src = "./img/mona_537x800.jpg";
       // image.src = "./img/rainbow-800.jpg";
     }
 
-    if (canvasRef && sourceImg) {
+    if (canvasRef && imgData) {
       setCanvasRef(canvasRef);
       const ctx = canvasRef.current.getContext("2d");
       canvasRef.current.width = width;
       canvasRef.current.height = height;
 
-      network = new Network(ctx, Settings, width, height);
-      network.addImage(sourceImg);
+      network = new Network(ctx, width, height);
       resetNetwork();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [width, height, sourceImg]);
+  }, [width, height, imgData]);
 
   React.useEffect(() => {
     resetNetwork();
@@ -73,7 +73,8 @@ const Display = ({
     network.bounds = getBounds({ ctx, bounds, width, height });
     network.obstacles = getObstacles(ctx, obstacles);
     network.attractors = getAttractors(ctx);
-    addStartNodes(ctx, startPoints);
+
+    addStartNodes(ctx, startPoints, width, imgData);
   };
 
   return (
@@ -98,10 +99,12 @@ const CanvasHolder = styled.div`
 
 const CanvasStyled = styled.canvas``;
 
-const addStartNodes = (ctx, startPoints) => {
+const addStartNodes = (ctx, startPoints, width, imgData) => {
+  // getImgData
+
   for (let pt of startPoints) {
     const vPt = new Vec2(pt[0], pt[1]);
-    network.addNode(new Node(null, vPt, true, ctx, Settings, undefined));
+    network.addNode(new Node(null, vPt, true, ctx, imgData, width));
   }
 };
 
@@ -128,11 +131,25 @@ const getBounds = ({ ctx, bounds, width, height }) => {
     boundsPoints = bounds;
   }
 
-  const boundArr = [new Path(boundsPoints, "Bounds", ctx, Settings)];
+  const boundArr = [new Path(boundsPoints, "Bounds", ctx)];
   return boundArr;
 };
 
 const getAttractors = (ctx) => {
   let gridAttractors = getGridOfAttractors(150, 150, ctx, 10, network.bounds);
   return gridAttractors;
+};
+
+const getImgData = (sourceImg) => {
+  const sourceW = sourceImg.width;
+  const sourceH = sourceImg.height;
+
+  const newCanvas = document.createElement("canvas");
+  const ctx = newCanvas.getContext("2d");
+  newCanvas.width = sourceW;
+  newCanvas.height = sourceH;
+
+  ctx.drawImage(sourceImg, 0, 0, sourceW, sourceH, 0, 0, sourceW, sourceH);
+
+  return ctx.getImageData(0, 0, sourceW, sourceH);
 };
