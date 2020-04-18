@@ -21,6 +21,7 @@ const Display = ({
   reRunId,
   setCanvasRef,
 }) => {
+  const [bgImg, setBgImg] = useState(null);
   const [sourceImg, setSourceImg] = useState(null);
   const [imgData, setImgData] = useState(null);
 
@@ -41,21 +42,33 @@ const Display = ({
         setImgData(getImgData(image));
       };
       // image.src = "./img/gove_750x1000.jpg";
+      // image.src = "./img/easter-2019_1778x1000.jpg";
       image.src = "./img/mona_537x800.jpg";
       // image.src = "./img/rainbow-800.jpg";
     }
 
-    if (canvasRef && imgData) {
+    if (!bgImg) {
+      //easter-2019-bw.jpg
+      const image = new Image();
+      image.crossOrigin = "Anonymous";
+      image.onload = () => {
+        setBgImg(image);
+      };
+      image.src = "./img/mona_537x800.jpg";
+      // image.src = "./img/easter-2019-bw_1778x1000.jpg";
+    }
+
+    if (canvasRef && imgData && bgImg) {
       setCanvasRef(canvasRef);
       const ctx = canvasRef.current.getContext("2d");
       canvasRef.current.width = width;
       canvasRef.current.height = height;
 
-      network = new Network(ctx, width, height);
+      network = new Network(ctx, width, height, bgImg);
       resetNetwork();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [width, height, imgData]);
+  }, [width, height, imgData, bgImg]);
 
   React.useEffect(() => {
     resetNetwork();

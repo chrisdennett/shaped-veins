@@ -7,13 +7,13 @@ export default class Node {
     this.imgData = imgData;
     this.width = width;
 
-    this.segmentLength = 3;
-    this.useAlpha = true;
+    this.segmentLength = 5;
+    this.useAlpha = false;
     this.renderMode = "lines";
-    this.showTips = true;
+    this.showTips = false;
     this.tipThickness = 2;
     // this.tipColor = "red";
-    this.branchColor = "blue";
+    this.branchColor = "white";
     this.branchThickness = 1;
 
     if (this.imgData) {

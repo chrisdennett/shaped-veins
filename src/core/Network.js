@@ -3,8 +3,9 @@ import * as Vec2 from "vec2";
 import { random } from "./Utilities";
 
 export default class Network {
-  constructor(ctx, width, height) {
+  constructor(ctx, width, height, bgImg) {
     this.ctx = ctx;
+    this.bgImg = bgImg;
     this.width = width;
     this.height = height;
     this.attractors = []; // attractors influence node growth
@@ -13,12 +14,12 @@ export default class Network {
     this.bounds = [];
     this.obstacles = [];
 
-    this.backgroundColour = "rgba(0,0,0,1)";
+    this.backgroundColour = "rgba(0,0,0,0.9)";
     this.showNodes = true;
     this.venationType = "open"; // 'closed'
     this.enableCanalization = true;
-    this.killDistance = 3;
-    this.attractionDistance = 15;
+    this.killDistance = 5;
+    this.attractionDistance = 25;
 
     this.buildSpatialIndices();
   }
@@ -164,8 +165,15 @@ export default class Network {
     this.drawNodes();
   }
 
+  drawBgImage() {
+    this.ctx.drawImage(this.bgImg, 0, 0);
+  }
+
   drawBackground() {
     this.ctx.clearRect(0, 0, this.width, this.height);
+
+    this.drawBgImage();
+
     this.ctx.beginPath();
     this.ctx.fillStyle = this.backgroundColour;
     this.ctx.fillRect(0, 0, this.width, this.height);
