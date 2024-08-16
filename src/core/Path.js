@@ -1,10 +1,9 @@
-import Defaults from "./Defaults";
 import * as Vec2 from "vec2";
 
 let inside = require("point-in-polygon");
 
 export default class Path {
-  constructor(polygon, type, ctx, settings) {
+  constructor(polygon, type, ctx) {
     this.polygon = polygon; // array of arrays containing coordinates defining a polygon ([[x0,y0],[x1,y1],...])
     this.ctx = ctx; // global canvas context
     this.type = type; // string either 'Bounds' or 'Obstacle'
@@ -15,8 +14,6 @@ export default class Path {
     this.width = -1; // width of transformed polygon - will be calculated using this.calculateDimensions()
     this.height = -1; // height of transformed polygon - will be calculated using this.calculateDimensions()
     this.isCentered = false; // whether or not to automatically translate to screen center
-
-    this.settings = Object.assign({}, Defaults, settings);
 
     this.calculateDimensions();
   }
@@ -110,40 +107,6 @@ export default class Path {
         this.polygon[i][0] * this.scale + this.origin.x,
         this.polygon[i][1] * this.scale + this.origin.y,
       ]);
-    }
-  }
-
-  draw() {
-    if (
-      (this.settings.ShowBounds && this.type === "Bounds") ||
-      (this.settings.ShowObstacles && this.type === "Obstacles")
-    ) {
-      this.ctx.beginPath();
-      this.ctx.moveTo(
-        this.transformedPolygon[0][0],
-        this.transformedPolygon[0][1]
-      );
-
-      // Draw sequential lines to all points of the polygon
-      for (let i = 0; i < this.transformedPolygon.length; i++) {
-        this.ctx.lineTo(
-          this.transformedPolygon[i][0],
-          this.transformedPolygon[i][1]
-        );
-      }
-
-      if (this.type === "Bounds") {
-        this.ctx.strokeStyle = this.settings.Colors.BoundsBorderColor;
-        this.ctx.lineWidth = this.settings.BoundsBorderThickness;
-        this.ctx.fillStyle = this.settings.Colors.BoundsFillColor;
-
-        this.ctx.stroke();
-        this.ctx.lineWidth = 1;
-      } else if (this.type === "Obstacle") {
-        this.ctx.fillStyle = this.settings.Colors.ObstacleFillColor;
-      }
-
-      this.ctx.fill();
     }
   }
 }

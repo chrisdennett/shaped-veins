@@ -1,35 +1,37 @@
-import Defaults from "./Defaults";
 import KDBush from "kdbush";
 import * as Vec2 from "vec2";
 import { random } from "./Utilities";
 
 export default class Network {
-  constructor(ctx, settings) {
+  constructor(ctx, width, height, bgImg) {
     this.ctx = ctx;
-    this.settings = Object.assign({}, Defaults, settings);
-
+    this.bgImg = bgImg;
+    this.width = width;
+    this.height = height;
     this.attractors = []; // attractors influence node growth
     this.nodes = []; // nodes are connected to form branches
 
-    // this.nodesIndex; // kd-bush spatial index for all nodes
+    this.bounds = [];
+    this.obstacles = [];
 
-    this.bounds = []; // array of Path objects that branches cannot grow outside of
-    this.obstacles = []; // array of Path objects that branches must avoid
+    this.backgroundColour = "rgba(0,0,0,0.85)";
+    this.showNodes = true;
+    this.venationType = "open";
+    this.enableCanalization = true;
+    this.killDistance = 5;
+    this.attractionDistance = 25;
 
     this.buildSpatialIndices();
   }
 
-  update() {
-    // Skip iteration if paused
-    if (this.settings.IsPaused) {
-      return;
-    }
+  update(isPaused) {
+    if (isPaused) return;
 
     // Associate attractors with nearby nodes to figure out where growth should occur
     for (let [attractorID, attractor] of this.attractors.entries()) {
-      switch (this.settings.VenationType) {
+      switch (this.venationType) {
         // For open venation, only associate this attractor with its closest node
-        case "Open":
+        case "open":
           let closestNode = this.getClosestNode(
             attractor,
             this.getNodesInAttractionZone(attractor)
@@ -43,7 +45,7 @@ export default class Network {
           break;
 
         // For closed venation, associate this attractor with all nodes in its relative neighborhood
-        case "Closed":
+        case "closed":
           let neighborhoodNodes = this.getRelativeNeighborNodes(attractor);
           let nodesInKillZone = this.getNodesInKillZone(attractor);
 
@@ -110,7 +112,7 @@ export default class Network {
       node.influencedBy = [];
 
       // Perform auxin flux canalization (line segment thickening)
-      if (node.isTip && this.settings.EnableCanalization) {
+      if (node.isTip && this.enableCanalization) {
         let currentNode = node;
 
         while (currentNode.parent !== null) {
@@ -126,7 +128,7 @@ export default class Network {
 
     // Remove any attractors that have been reached by their associated nodes
     for (let [attractorID, attractor] of this.attractors.entries()) {
-      if (this.settings.VenationType === "Open") {
+      if (this.venationType === "open") {
         // For open venation, remove the attractor as soon as any node reaches it
         if (attractor.reached) {
           this.attractors.splice(attractorID, 1);
@@ -140,8 +142,7 @@ export default class Network {
 
           for (let node of attractor.influencingNodes) {
             if (
-              node.position.distance(attractor.position) >
-              this.settings.KillDistance
+              node.position.distance(attractor.position) > this.killDistance
             ) {
               allNodesReached = false;
             }
@@ -160,60 +161,28 @@ export default class Network {
 
   draw() {
     this.drawBackground();
-    this.drawBounds();
-    this.drawObstacles();
-    this.drawattractors();
+    // this.ctx.globalCompositeOperation = "lighter";
     this.drawNodes();
   }
 
+  drawBgImage() {
+    this.ctx.drawImage(this.bgImg, 0, 0);
+  }
+
   drawBackground() {
-    this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    this.ctx.clearRect(0, 0, this.width, this.height);
+
+    this.drawBgImage();
 
     this.ctx.beginPath();
-    this.ctx.fillStyle = this.settings.Colors.BackgroundColor;
-    this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-  }
-
-  drawBounds() {
-    if (this.settings.ShowBounds && this.bounds !== undefined) {
-      for (let bound of this.bounds) {
-        bound.draw();
-      }
-    }
-  }
-
-  drawObstacles() {
-    if (this.settings.ShowObstacles && this.obstacles !== undefined) {
-      for (let obstacle of this.obstacles) {
-        obstacle.draw();
-      }
-    }
+    this.ctx.fillStyle = this.backgroundColour;
+    this.ctx.fillRect(0, 0, this.width, this.height);
   }
 
   drawNodes() {
-    if (this.settings.ShowNodes) {
+    if (this.showNodes) {
       for (let node of this.nodes) {
         node.draw();
-      }
-    }
-  }
-
-  drawattractors() {
-    for (let attractor of this.attractors) {
-      attractor.draw();
-
-      // Draw lines between each attractor and the nodes they are influencing
-      if (
-        this.settings.ShowInfluenceLines &&
-        attractor.influencingNodes.length > 0
-      ) {
-        for (let node of attractor.influencingNodes) {
-          this.ctx.beginPath();
-          this.ctx.moveTo(attractor.position.x, attractor.position.y);
-          this.ctx.lineTo(node.position.x, node.position.y);
-          this.ctx.strokeStyle = this.settings.Colors.InfluenceLinesColor;
-          this.ctx.stroke();
-        }
       }
     }
   }
@@ -264,29 +233,25 @@ export default class Network {
       .within(
         attractor.position.x,
         attractor.position.y,
-        this.settings.AttractionDistance
+        this.attractionDistance
       )
       .map((id) => this.nodes[id]);
   }
 
   getNodesInKillZone(attractor) {
     return this.nodesIndex
-      .within(
-        attractor.position.x,
-        attractor.position.y,
-        this.settings.KillDistance
-      )
+      .within(attractor.position.x, attractor.position.y, this.killDistance)
       .map((id) => this.nodes[id]);
   }
 
   getClosestNode(attractor, nearbyNodes) {
     let closestNode = null,
-      record = this.settings.AttractionDistance;
+      record = this.attractionDistance;
 
     for (let node of nearbyNodes) {
       let distance = node.position.distance(attractor.position);
 
-      if (distance < this.settings.KillDistance) {
+      if (distance < this.killDistance) {
         attractor.reached = true;
         closestNode = null;
       } else if (distance < record) {
@@ -363,76 +328,5 @@ export default class Network {
       (p) => p.position.x,
       (p) => p.position.y
     );
-  }
-
-  toggleNodes() {
-    this.settings.ShowNodes = !this.settings.ShowNodes;
-  }
-
-  toggleTips() {
-    this.settings.ShowTips = !this.settings.ShowTips;
-
-    for (let node of this.nodes) {
-      node.settings.ShowTips = !node.settings.ShowTips;
-    }
-  }
-
-  toggleattractors() {
-    this.settings.Showattractors = !this.settings.Showattractors;
-
-    for (let attractor of this.attractors) {
-      attractor.settings.Showattractors = !attractor.settings.Showattractors;
-    }
-  }
-
-  toggleAttractionZones() {
-    this.settings.ShowAttractionZones = !this.settings.ShowAttractionZones;
-
-    for (let attractor of this.attractors) {
-      attractor.settings.ShowAttractionZones = !attractor.settings
-        .ShowAttractionZones;
-    }
-  }
-
-  toggleKillZones() {
-    this.settings.ShowKillZones = !this.settings.ShowKillZones;
-
-    for (let attractor of this.attractors) {
-      attractor.settings.ShowKillZones = !attractor.settings.ShowKillZones;
-    }
-  }
-
-  toggleInfluenceLines() {
-    this.settings.ShowInfluenceLines = !this.settings.ShowInfluenceLines;
-  }
-
-  toggleBounds() {
-    this.settings.ShowBounds = !this.settings.ShowBounds;
-  }
-
-  toggleObstacles() {
-    this.settings.ShowObstacles = !this.settings.ShowObstacles;
-  }
-
-  toggleCanalization() {
-    this.settings.EnableCanalization = !this.settings.EnableCanalization;
-
-    if (!this.settings.EnableCanalization) {
-      for (let node of this.nodes) {
-        node.thickness = 0;
-      }
-    }
-  }
-
-  toggleOpacityBlending() {
-    this.settings.EnableOpacityBlending = !this.settings.EnableOpacityBlending;
-
-    for (let node of this.nodes) {
-      node.settings.EnableOpacityBlending = this.settings.EnableOpacityBlending;
-    }
-  }
-
-  togglePause() {
-    this.settings.IsPaused = !this.settings.IsPaused;
   }
 }

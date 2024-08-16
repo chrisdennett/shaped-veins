@@ -8,9 +8,10 @@ import Display from "./display/Display";
 import ShapeMaker from "./shapeMaker/ShapeMaker";
 
 export default function App() {
+  const [isPaused, setIsPaused] = useState(false);
   const [canvasRef, setCanvasRef] = useState(0);
   const [reRunId, setReRunId] = useState(0);
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [bounds, setBounds] = useLocalStorage("bounds", []);
   const [isAddingBounds, setIsAddingBounds] = useState(false);
   const [startPoints, setStartPoints] = useLocalStorage("startPoints", null);
@@ -18,8 +19,13 @@ export default function App() {
   const [obstacles, setObstacles] = useLocalStorage("obstacles", []);
   const [isAddingObstacles, setIsAddingObstacles] = useState(false);
 
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+  const width = 1778;
+  const height = 1000;
+  // const width = 537;
+  // const height = 800;
+
+  //easter-2019_1778x1000.jpg
+  //
 
   if (startPoints === null) {
     setStartPoints([[100, 100]]);
@@ -85,6 +91,8 @@ export default function App() {
     save_as_svg,
     reRun,
     clearShape,
+    isPaused,
+    setIsPaused,
     onSave: () => saveCanvas(canvasRef.current),
   };
 
@@ -113,6 +121,7 @@ export default function App() {
         width={width}
         height={height}
         bounds={bounds}
+        isPaused={isPaused}
         startPoints={startPoints}
         obstacles={obstacles}
         reRunId={reRunId}

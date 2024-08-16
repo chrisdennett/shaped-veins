@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import { useAnimationFrame } from "../hooks/useAnimationFrame";
 import * as Vec2 from "vec2";
@@ -8,7 +8,6 @@ import Node from "../core/Node";
 import Path from "../core/Path";
 // import { setupKeyListeners } from "../core/KeyboardInteractions";
 // import { getCircleOfPoints } from "../core/Utilities";
-import Settings from "../core/Settings";
 
 let network;
 
@@ -16,30 +15,60 @@ const Display = ({
   width,
   height,
   bounds,
+  isPaused,
   obstacles,
   startPoints,
   reRunId,
   setCanvasRef,
 }) => {
+  const [bgImg, setBgImg] = useState(null);
+  const [sourceImg, setSourceImg] = useState(null);
+  const [imgData, setImgData] = useState(null);
+
   useAnimationFrame(() => {
-    network.update();
+    if (!network) return;
+    network.update(isPaused);
     network.draw();
   });
 
   const canvasRef = useRef(null);
 
   React.useEffect(() => {
-    if (canvasRef) {
+    if (!sourceImg) {
+      const image = new Image();
+      image.crossOrigin = "Anonymous";
+      image.onload = () => {
+        setSourceImg(image);
+        setImgData(getImgData(image));
+      };
+      // image.src = "./img/gove_750x1000.jpg";
+      image.src = "./img/easter-2019_1778x1000.jpg";
+      // image.src = "./img/mona_537x800.jpg";
+      // image.src = "./img/rainbow-800.jpg";
+    }
+
+    if (!bgImg) {
+      //easter-2019-bw.jpg
+      const image = new Image();
+      image.crossOrigin = "Anonymous";
+      image.onload = () => {
+        setBgImg(image);
+      };
+      // image.src = "./img/mona_537x800.jpg";
+      image.src = "./img/easter-2019-bw_1778x1000.jpg";
+    }
+
+    if (canvasRef && imgData && bgImg) {
       setCanvasRef(canvasRef);
       const ctx = canvasRef.current.getContext("2d");
       canvasRef.current.width = width;
       canvasRef.current.height = height;
-      // ctx.drawImage(framedCanvas, 0, 0);
-      network = new Network(ctx, Settings);
+
+      network = new Network(ctx, width, height, bgImg);
       resetNetwork();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [width, height]);
+  }, [width, height, imgData, bgImg]);
 
   React.useEffect(() => {
     resetNetwork();
@@ -47,14 +76,18 @@ const Display = ({
   }, [bounds, startPoints, obstacles, reRunId]);
 
   const resetNetwork = () => {
+    if (!network) return;
+
     const ctx = canvasRef.current.getContext("2d");
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
+
     network.reset();
     network.bounds = getBounds({ ctx, bounds, width, height });
     network.obstacles = getObstacles(ctx, obstacles);
     network.attractors = getAttractors(ctx);
-    addStartNodes(ctx, startPoints);
+
+    addStartNodes(ctx, startPoints, width, imgData);
   };
 
   return (
@@ -79,11 +112,12 @@ const CanvasHolder = styled.div`
 
 const CanvasStyled = styled.canvas``;
 
-const addStartNodes = (ctx, startPoints) => {
+const addStartNodes = (ctx, startPoints, width, imgData) => {
+  // getImgData
+
   for (let pt of startPoints) {
-    network.addNode(
-      new Node(null, new Vec2(pt[0], pt[1]), true, ctx, Settings, undefined)
-    );
+    const vPt = new Vec2(pt[0], pt[1]);
+    network.addNode(new Node(null, vPt, true, ctx, imgData, width));
   }
 };
 
@@ -110,11 +144,25 @@ const getBounds = ({ ctx, bounds, width, height }) => {
     boundsPoints = bounds;
   }
 
-  const boundArr = [new Path(boundsPoints, "Bounds", ctx, Settings)];
+  const boundArr = [new Path(boundsPoints, "Bounds", ctx)];
   return boundArr;
 };
 
 const getAttractors = (ctx) => {
   let gridAttractors = getGridOfAttractors(150, 150, ctx, 10, network.bounds);
   return gridAttractors;
+};
+
+const getImgData = (sourceImg) => {
+  const sourceW = sourceImg.width;
+  const sourceH = sourceImg.height;
+
+  const newCanvas = document.createElement("canvas");
+  const ctx = newCanvas.getContext("2d");
+  newCanvas.width = sourceW;
+  newCanvas.height = sourceH;
+
+  ctx.drawImage(sourceImg, 0, 0, sourceW, sourceH, 0, 0, sourceW, sourceH);
+
+  return ctx.getImageData(0, 0, sourceW, sourceH);
 };
