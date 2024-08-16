@@ -7,14 +7,14 @@ export default class Node {
     this.imgData = imgData;
     this.width = width;
 
-    this.segmentLength = 5;
+    this.segmentLength = 6;
     this.useAlpha = false;
     this.renderMode = "lines";
-    this.showTips = false;
-    this.tipThickness = 2;
+    this.showTips = true;
+    this.tipThickness = 0.5;
     // this.tipColor = "red";
-    this.branchColor = "white";
     this.branchThickness = 1;
+    this.colourBleedFrac = 0.6;
 
     if (this.imgData) {
       const { x, y } = this.position;
@@ -26,7 +26,7 @@ export default class Node {
       );
 
       // this.ctx.strokeStyle = `hsl(${h}, ${s}%, ${l}%)`;
-      this.branchColor = `rgba(${r}, ${g}, ${b}, ${1})`;
+      this.branchColor = { r, g, b };
     }
 
     this.influencedBy = []; // references to all Attractors influencing this node each frame
@@ -88,16 +88,22 @@ export default class Node {
     var g = imageData.data[colorIndices[1]];
     var b = imageData.data[colorIndices[2]];
 
-    if (!this.pathColour) {
+    if (!this.parent || !this.parent.branchColor) {
       return { r, g, b };
     }
 
-    const fracOfNew = 0.02;
+    const fracOfNew = this.colourBleedFrac;
     const fracOfOld = 1 - fracOfNew;
 
-    const newR = Math.round(r * fracOfNew + this.pathColour.r * fracOfOld);
-    const newG = Math.round(g * fracOfNew + this.pathColour.g * fracOfOld);
-    const newB = Math.round(b * fracOfNew + this.pathColour.b * fracOfOld);
+    const newR = Math.round(
+      r * fracOfNew + this.parent.branchColor.r * fracOfOld
+    );
+    const newG = Math.round(
+      g * fracOfNew + this.parent.branchColor.g * fracOfOld
+    );
+    const newB = Math.round(
+      b * fracOfNew + this.parent.branchColor.b * fracOfOld
+    );
 
     return { r: newR, g: newG, b: newB };
   }
@@ -109,6 +115,10 @@ export default class Node {
         this.ctx.globalAlpha = this.thickness / 3 + 0.2;
       }
 
+      const branchCol = `rgba(${this.branchColor.r}, ${this.branchColor.g}, ${
+        this.branchColor.b
+      }, ${1})`;
+
       // "Lines" render mode
       if (this.renderMode === "lines") {
         this.ctx.beginPath();
@@ -117,15 +127,16 @@ export default class Node {
         this.ctx.lineTo(this.parent.position.x, this.parent.position.y);
 
         if (this.isTip && this.showTips) {
-          this.ctx.strokeStyle = this.tipColor;
-          this.ctx.lineWidth = this.tipThickness;
+          this.ctx.fillStyle = branchCol;
+          this.ctx.arc(this.position.x, this.position.y, 2, 0, 2 * Math.PI);
+          this.ctx.fill();
+          this.ctx.fillStyle = "none";
         } else {
-          this.ctx.strokeStyle = this.branchColor;
+          this.ctx.strokeStyle = branchCol;
           this.ctx.lineWidth = this.branchThickness + this.thickness;
+          this.ctx.stroke();
+          this.ctx.lineWidth = 1;
         }
-
-        this.ctx.stroke();
-        this.ctx.lineWidth = 1;
       }
 
       // Reset global opacity if it was changed due to opacity gradient flag

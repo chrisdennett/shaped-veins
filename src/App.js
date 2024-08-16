@@ -19,8 +19,13 @@ export default function App() {
   const [obstacles, setObstacles] = useLocalStorage("obstacles", []);
   const [isAddingObstacles, setIsAddingObstacles] = useState(false);
 
-  const width = 537;
-  const height = 800;
+  const width = 1778;
+  const height = 1000;
+  // const width = 537;
+  // const height = 800;
+
+  //easter-2019_1778x1000.jpg
+  //
 
   if (startPoints === null) {
     setStartPoints([[100, 100]]);

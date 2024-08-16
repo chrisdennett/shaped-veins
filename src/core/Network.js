@@ -14,9 +14,9 @@ export default class Network {
     this.bounds = [];
     this.obstacles = [];
 
-    this.backgroundColour = "rgba(0,0,0,0.9)";
+    this.backgroundColour = "rgba(0,0,0,0.85)";
     this.showNodes = true;
-    this.venationType = "open"; // 'closed'
+    this.venationType = "open";
     this.enableCanalization = true;
     this.killDistance = 5;
     this.attractionDistance = 25;

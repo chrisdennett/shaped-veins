@@ -42,8 +42,8 @@ const Display = ({
         setImgData(getImgData(image));
       };
       // image.src = "./img/gove_750x1000.jpg";
-      // image.src = "./img/easter-2019_1778x1000.jpg";
-      image.src = "./img/mona_537x800.jpg";
+      image.src = "./img/easter-2019_1778x1000.jpg";
+      // image.src = "./img/mona_537x800.jpg";
       // image.src = "./img/rainbow-800.jpg";
     }
 
@@ -54,8 +54,8 @@ const Display = ({
       image.onload = () => {
         setBgImg(image);
       };
-      image.src = "./img/mona_537x800.jpg";
-      // image.src = "./img/easter-2019-bw_1778x1000.jpg";
+      // image.src = "./img/mona_537x800.jpg";
+      image.src = "./img/easter-2019-bw_1778x1000.jpg";
     }
 
     if (canvasRef && imgData && bgImg) {
